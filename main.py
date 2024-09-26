@@ -235,36 +235,37 @@ if gueltigkeiten[0] == True or False:
 
     automation_frame = ttk.LabelFrame(fenster, text="Automation")
     automation_frame.grid(row=1, column=1, padx=20, pady=20, sticky="nsew")
+    if gueltigkeiten[0] == True:
+     # Recorder-Elemente
+       ttk.Label(recorder_frame, text="Aufnahmen:").grid(row=0, column=0, padx=5, pady=5)
+       combobox = ttk.Combobox(recorder_frame, state="readonly")
+       combobox.grid(row=1, column=0, padx=5, pady=5)
+       combobox.bind("<Button-1>", populate_dropdown) 
+       combobox.bind("<<ComboboxSelected>>", on_select)
 
-    # Recorder-Elemente
-    ttk.Label(recorder_frame, text="Aufnahmen:").grid(row=0, column=0, padx=5, pady=5)
-    combobox = ttk.Combobox(recorder_frame, state="readonly")
-    combobox.grid(row=1, column=0, padx=5, pady=5)
-    combobox.bind("<Button-1>", populate_dropdown) 
-    combobox.bind("<<ComboboxSelected>>", on_select)
+       ttk.Button(recorder_frame, text="Rec", command=button_rec).grid(row=2, column=0, padx=5, pady=5)
+       ttk.Button(recorder_frame, text="Play", command=button_play).grid(row=3, column=0, padx=5, pady=5)
 
-    ttk.Button(recorder_frame, text="Rec", command=button_rec).grid(row=2, column=0, padx=5, pady=5)
-    ttk.Button(recorder_frame, text="Play", command=button_play).grid(row=3, column=0, padx=5, pady=5)
+       # Keybindings-Elemente
+       ttk.Label(keybindings_frame, text="Pause:").grid(row=0, column=0, padx=5, pady=5)
+       entry1 = ttk.Entry(keybindings_frame)
+       entry1.grid(row=0, column=1, padx=5, pady=5)
 
-    # Keybindings-Elemente
-    ttk.Label(keybindings_frame, text="Pause:").grid(row=0, column=0, padx=5, pady=5)
-    entry1 = ttk.Entry(keybindings_frame)
-    entry1.grid(row=0, column=1, padx=5, pady=5)
+       ttk.Label(keybindings_frame, text="Stop:").grid(row=1, column=0, padx=5, pady=5)
+       entry2 = ttk.Entry(keybindings_frame)
+       entry2.grid(row=1, column=1, padx=5, pady=5)
 
-    ttk.Label(keybindings_frame, text="Stop:").grid(row=1, column=0, padx=5, pady=5)
-    entry2 = ttk.Entry(keybindings_frame)
-    entry2.grid(row=1, column=1, padx=5, pady=5)
+       ttk.Button(keybindings_frame, text="Keybindings speichern", command=on_confirm).grid(row=2, column=0, columnspan=2, padx=5, pady=5)
 
-    ttk.Button(keybindings_frame, text="Keybindings speichern", command=on_confirm).grid(row=2, column=0, columnspan=2, padx=5, pady=5)
+       # Info-Elemente
+       ttk.Button(info_frame, text="Lizenz", command=button_lizenz).grid(row=0, column=0, padx=5, pady=5)
+       ttk.Button(info_frame, text="Hilfe", command=show_help).grid(row=1, column=0, padx=5, pady=5)
 
-    # Info-Elemente
-    ttk.Button(info_frame, text="Lizenz", command=button_lizenz).grid(row=0, column=0, padx=5, pady=5)
-    ttk.Button(info_frame, text="Hilfe", command=show_help).grid(row=1, column=0, padx=5, pady=5)
+    if gueltigkeiten[1] == True:
+       # Automation-Elemente (vorerst leer)
+       # ...
 
-    # Automation-Elemente (vorerst leer)
-    # ...
-
-    # Standardwerte laden und in die Eingabefelder setzen
+       # Standardwerte laden und in die Eingabefelder setzen
     wert1, wert2 = lade_standardwerte()
 
     # Fenster anzeigen
