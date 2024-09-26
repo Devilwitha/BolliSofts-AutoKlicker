@@ -27,48 +27,77 @@ selected_file=None
 wert1=None
 wert2=None
 
+
+from cryptography.fernet import Fernet
+from datetime import datetime, date
+
 def datum_aus_token_entschluesseln(schluessel_datei="./Lizenz/Lizenz.key", token_datei="./Lizenz/_Lizenz.enc"):
     """
-    Entschlüsselt ein Datum aus einer Token-Datei und prüft, ob es noch gültig ist.
+    Entschlüsselt ein oder mehrere Datumswerte (repräsentieren Lizenzen) aus einer Token-Datei 
+    und prüft deren Gültigkeit.
 
     Args:
         schluessel_datei: Der Pfad zur Datei, die den Schlüssel enthält (Standard: "schluessel.key").
         token_datei: Der Pfad zur Datei, die das Token enthält (Standard: "token.enc").
 
     Returns:
-        Das entschlüsselte Datum als String im Format 'YYYY-MM-DD'.
+        Ein Tupel bestehend aus:
+            - datum_werte: Eine Liste der entschlüsselten Datumswerte als Strings im Format 'YYYY-MM-DD'.
+            - gueltigkeiten: Eine Liste, die für jedes Datum angibt, ob es gültig ist (True) oder nicht (False).
     """
 
-    # Schlüssel und Token aus Dateien laden
     try:
+        # Schlüssel und Token aus Dateien laden
         with open(schluessel_datei, "rb") as schluessel_file:
             schluessel = schluessel_file.read()
         with open(token_datei, "rb") as token_file:
             token = token_file.read()
-    except:
-            messagebox.showinfo("Keine Lizenz gefunden", "Es wurde keine Lizenz gefunden bitte erwerben sie eine Lizenz schreiben sie nico.bollhalder22@gmail.com\nPogramm wird nun geschlossen!")
-    try:
+
         f = Fernet(schluessel)
         datum_bytes = f.decrypt(token)
         datum_str = datum_bytes.decode('utf-8')
-    except:
-        messagebox.showinfo("Lizenz Manipuliert!", "Lizenz wurde manipuliert oder ist defekt!\nPogramm wird nun geschlossen!")
-        datum_str=None
 
-    # Datum überprüfen
-    entschluesseltes_datum = datetime.strptime(datum_str, "%Y-%m-%d").date()
-    heute = date.today()
+        # Datumswerte trennen und überprüfen
+        datum_werte = datum_str.split(":")
+        gueltigkeiten = []  # Liste zur Speicherung der Gültigkeiten
+        heute = date.today()
 
-    if entschluesseltes_datum >= heute:
-        return datum_str,True # gültig
-    else:
-        return datum_str,False # abgelaufen
+        for datum_wert in datum_werte:
+            try:
+                entschluesseltes_datum = datetime.strptime(datum_wert, "%Y-%m-%d").date()
+                if entschluesseltes_datum >= heute:
+                    gueltigkeiten.append(True)  # Lizenz gültig
+                    print(f"Lizenz mit Ablaufdatum {datum_wert} ist gültig.")
+                else:
+                    gueltigkeiten.append(False)  # Lizenz abgelaufen
+                    print(f"Lizenz mit Ablaufdatum {datum_wert} ist abgelaufen.")
+            except ValueError:
+                print(f"Fehler: Ungültiges Datumsformat '{datum_wert}' gefunden.")
+                gueltigkeiten.append(False)  # Bei Fehler als ungültig markieren
 
-datum, ist_gueltig = datum_aus_token_entschluesseln() 
-if ist_gueltig == False:
-    messagebox.showinfo("Lizenz", "Lizenz ungültig/abgelaufen oder nicht vorhanden!")
+    except FileNotFoundError:
+        print(f"Fehler: Datei nicht gefunden. Überprüfe die Pfade '{schluessel_datei}' und '{token_datei}'.")
+        return [], []
+    except cryptography.fernet.InvalidToken:
+        print("Fehler: Entschlüsselung fehlgeschlagen. Überprüfe den Schlüssel.")
+        return [], []
+
+    return datum_werte, gueltigkeiten
+
+# Hauptprogramm
+datum_werte, gueltigkeiten = datum_aus_token_entschluesseln()
+print(gueltigkeiten[0])
+#print(gueltigkeiten[1])
+
+if not any(gueltigkeiten):  # Prüfung, ob mindestens eine Lizenz gültig ist
+    print("Alle Lizenzen sind ungültig/abgelaufen!")
+elif len(datum_werte) >= 3: 
+    # Hier könntest du weitere Aktionen mit spezifischen Lizenzen durchführen,
+    # falls nötig (z.B. datum_werte[1], datum_werte[2]) unter Berücksichtigung 
+    # ihrer Gültigkeit aus der Liste 'gueltigkeiten'
+    pass
     
-if ist_gueltig == True:
+if gueltigkeiten[0] == True:
     #{
     def play_actions_in_thread():
         try:
@@ -90,7 +119,10 @@ if ist_gueltig == True:
         threading.Thread(target=play_actions_in_thread).start()
 
     def button_lizenz():
-        messagebox.showinfo("Lizenz", "Ihre Lizenz ist bis "+str(datum)+" gültig\n\nFür eine neue Lizenz oder eine Lizenz verlängerung kontaktieren sie:\n\nnico.bollhalder22@gmail.com\n\n")
+        try:
+            messagebox.showinfo("Lizenz", "Ihre Lizenz ist bis "+str(datum_werte[0])+str(datum_werte[1])+" gültig\n\nFür eine neue Lizenz oder eine Lizenz verlängerung kontaktieren sie:\n\nnico.bollhalder22@gmail.com\n\n")
+        except:
+            messagebox.showinfo("Lizenz", "Ihre Lizenz ist bis "+str(datum_werte[0])+" gültig\n\nFür eine neue Lizenz oder eine Lizenz verlängerung kontaktieren sie:\n\nnico.bollhalder22@gmail.com\n\n")
 
     def populate_dropdown(event):
         """Diese Funktion wird aufgerufen, wenn die Dropdown-Liste geöffnet wird. 
