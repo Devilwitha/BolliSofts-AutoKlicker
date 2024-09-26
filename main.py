@@ -97,7 +97,7 @@ elif len(datum_werte) >= 3:
     # ihrer Gültigkeit aus der Liste 'gueltigkeiten'
     pass
     
-if gueltigkeiten[0] == True:
+if gueltigkeiten[0] == True or False:
     #{
     def play_actions_in_thread():
         try:
