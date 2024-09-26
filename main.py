@@ -1,6 +1,6 @@
 ##############################
 # Pogramm: Main Pogramm      #
-# Code Version: 1.2          #
+# Code Version: 1.3          #
 # Code by BolliSoft          #
 # (c) by Nico Bollhalder     #
 ##############################
