@@ -264,7 +264,7 @@ if gueltigkeiten[0] == True or False:
     if gueltigkeiten[1] == True:
        # Automation-Elemente (vorerst leer)
        # ...
-
+       print("!")
        # Standardwerte laden und in die Eingabefelder setzen
     wert1, wert2 = lade_standardwerte()
 
