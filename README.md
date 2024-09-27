@@ -1,9 +1,5 @@
 # BolliSofts-AutoKlicker
 
-**Übersicht**
-
-Dieses Programm bietet Funktionen zur Aufnahme und Wiedergabe von Aktionen, zur Datenbankverwaltung und zum CSV-Vergleich. Es verwendet eine Lizenzdatei zur Steuerung des Zugriffs auf bestimmte Funktionen.
-
 **Code-Version**
 
 1.3
