@@ -21,6 +21,7 @@ include_files = [
     os.path.join(project_dir, "Lizenz"),
     os.path.join(project_dir, "Bilder"),
     os.path.join(project_dir, "Sprache"),
+    os.path.join(project_dir, "Exports"),
 ]
 
 # Definiere die Pakete, die inkludiert werden sollen
