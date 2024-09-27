@@ -319,4 +319,4 @@ if gueltigkeiten[0] == True or False:
 
     # Fenster anzeigen
     fenster.mainloop()
-    #}
+    #}#
