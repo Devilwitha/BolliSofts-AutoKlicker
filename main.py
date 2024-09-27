@@ -4,8 +4,7 @@
 # Code by BolliSoft          #
 # (c) by Nico Bollhalder     #
 ##############################
-print("hallo welt")
-print("hallo \nWelt")
+
 import sys
 sys.path.append('./DLL/Module/')
 sys.path.append('./DLL/Skripte/ScreenRec/')
@@ -103,7 +102,10 @@ def lade_sprache():
     with open(dateiname, "r", encoding="utf-8") as f:
         for zeile in f:
             text_id, text = zeile.strip().split(" = ")
-            texte[text_id] = text
+            # Ersetze '\\n' durch tatsächliche Zeilenumbrüche
+            textt = text.replace("\\n", "\n")
+            texte[text_id] = textt
+            
 
     return texte
 
@@ -112,7 +114,7 @@ texte = lade_sprache()
 
 # Hauptprogramm
 datum_werte, gueltigkeiten = datum_aus_token_entschluesseln()
-print(gueltigkeiten[0])
+#print(gueltigkeiten[0])
 #print(gueltigkeiten[1])
 
 if not any(gueltigkeiten):  # Prüfung, ob mindestens eine Lizenz gültig ist
