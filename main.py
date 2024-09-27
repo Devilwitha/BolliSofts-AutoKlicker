@@ -4,7 +4,8 @@
 # Code by BolliSoft          #
 # (c) by Nico Bollhalder     #
 ##############################
-
+print("hallo welt")
+print("hallo \nWelt")
 import sys
 sys.path.append('./DLL/Module/')
 sys.path.append('./DLL/Skripte/ScreenRec/')
@@ -22,6 +23,7 @@ import pyautogui
 import time
 import keyboard
 import os
+import locale
 
 selected_file=None
 wert1=None
@@ -84,6 +86,30 @@ def datum_aus_token_entschluesseln(schluessel_datei="./Lizenz/Lizenz.key", token
 
     return datum_werte, gueltigkeiten
 
+def lade_sprache():
+    """Lädt die Sprachdatei basierend auf der Windows-Spracheinstellung."""
+
+    # Sprache erkennen
+    sprache = locale.getdefaultlocale()[0][:2]  # z.B. 'de' oder 'en'
+    print(sprache)
+
+    # Sprachdatei laden
+    dateiname = f"./Sprache/{sprache}.txt"
+    if not os.path.exists(dateiname):
+        dateiname = "./Sprache/en.txt"  # Standardmäßig Deutsch laden
+    print(dateiname)
+
+    texte = {}
+    with open(dateiname, "r", encoding="utf-8") as f:
+        for zeile in f:
+            text_id, text = zeile.strip().split(" = ")
+            texte[text_id] = text
+
+    return texte
+
+# Sprachdatei laden
+texte = lade_sprache()
+
 # Hauptprogramm
 datum_werte, gueltigkeiten = datum_aus_token_entschluesseln()
 print(gueltigkeiten[0])
@@ -120,9 +146,12 @@ if gueltigkeiten[0] == True or False:
 
     def button_lizenz():
         try:
-            messagebox.showinfo("Lizenz", "Ihre Lizenz ist bis "+str(datum_werte[0])+str(datum_werte[1])+" gültig\n\nFür eine neue Lizenz oder eine Lizenz verlängerung kontaktieren sie:\n\nnico.bollhalder22@gmail.com\n\n")
+            if len(datum_werte) > 1:
+                messagebox.showinfo(texte["lizenz_titel"], texte["lizenz_nachricht_mehrere"].format(datum_werte[0], datum_werte[1]))
+            else:
+                messagebox.showinfo(texte["lizenz_titel"], texte["lizenz_nachricht"].format(datum_werte[0]))
         except:
-            messagebox.showinfo("Lizenz", "Ihre Lizenz ist bis "+str(datum_werte[0])+" gültig\n\nFür eine neue Lizenz oder eine Lizenz verlängerung kontaktieren sie:\n\nnico.bollhalder22@gmail.com\n\n")
+            messagebox.showinfo(texte["lizenz_titel"], texte["lizenz_nachricht"].format(datum_werte[0]))
 
     def populate_dropdown(event):
         """Diese Funktion wird aufgerufen, wenn die Dropdown-Liste geöffnet wird. 
@@ -142,27 +171,20 @@ if gueltigkeiten[0] == True or False:
 
     def show_help():
         wert1, wert2 = lade_standardwerte()
-        """
-        Erstellt und zeigt ein Fenster mit Hilfeinformationen an.
-        """
-
-        help_window = tk.Toplevel()  # Erstellt ein neues Fenster über dem Hauptfenster
-        help_window.title("Hilfe")
+        help_window = tk.Toplevel()
+        help_window.title(texte["hilfe_titel"])
         help_window.iconbitmap("./Bilder/FIcon.ico")
 
-        # Label mit dem Hilfetext
-        help_label = tk.Label(help_window, text=f"""
-        Dies ist das Maus- und Tastatur-Aufnahmeprogramm.
+    # Hole den Hilfetext und ersetze Platzhalter
+        hilfe_text_mit_werten = texte.get("hilfe_text", "Hilfetext nicht gefunden").format(wert1, wert2)
 
-        Tasten:
-        - {wert1} Fügt eine Verzögerung von 10 Sekunde hinzu.
-        - {wert2} Beendet die Aufnahme und speichert die Daten.
+    # Ersetze '\\n' durch tatsächliche Zeilenumbrüche
+        hilfe_text_mit_zeilenumbruechen = hilfe_text_mit_werten.replace("\\n", "\n")
 
-        Mausklicks und Tastatureingaben werden automatisch aufgezeichnet.
-        """)
+    # Label erstellen und als "rich text" behandeln
+        help_label = tk.Label(help_window, text=hilfe_text_mit_zeilenumbruechen, wraplength=350, justify='left')
         help_label.pack(padx=20, pady=20)
 
-        # Button zum Schließen des Hilfefensters
         close_button = tk.Button(help_window, text="Schließen", command=help_window.destroy)
         close_button.pack(padx=20, pady=20)
     
@@ -237,7 +259,7 @@ if gueltigkeiten[0] == True or False:
     automation_frame.grid(row=1, column=1, padx=20, pady=20, sticky="nsew")
     if gueltigkeiten[0] == True:
      # Recorder-Elemente
-       ttk.Label(recorder_frame, text="Aufnahmen:").grid(row=0, column=0, padx=5, pady=5)
+       ttk.Label(recorder_frame, text=texte["recorder_label"]).grid(row=0, column=0, padx=5, pady=5)
        combobox = ttk.Combobox(recorder_frame, state="readonly")
        combobox.grid(row=1, column=0, padx=5, pady=5)
        combobox.bind("<Button-1>", populate_dropdown) 
@@ -247,11 +269,14 @@ if gueltigkeiten[0] == True or False:
        ttk.Button(recorder_frame, text="Play", command=button_play).grid(row=3, column=0, padx=5, pady=5)
 
        # Keybindings-Elemente
-       ttk.Label(keybindings_frame, text="Pause:").grid(row=0, column=0, padx=5, pady=5)
+       keybindings_frame = ttk.LabelFrame(fenster, text=texte["keybindings_label"])
+       keybindings_frame.grid(row=1, column=0, padx=20, pady=20, sticky="nsew")
+       ttk.Label(keybindings_frame, text=texte["pause_label"]).grid(row=0, column=0, padx=5, pady=5)
+        # ... (Rest der Keybindings-Elemente bleiben unverändert)
        entry1 = ttk.Entry(keybindings_frame)
        entry1.grid(row=0, column=1, padx=5, pady=5)
 
-       ttk.Label(keybindings_frame, text="Stop:").grid(row=1, column=0, padx=5, pady=5)
+       ttk.Label(keybindings_frame, text=texte["stop_label"]).grid(row=1, column=0, padx=5, pady=5)
        entry2 = ttk.Entry(keybindings_frame)
        entry2.grid(row=1, column=1, padx=5, pady=5)
 
@@ -271,4 +296,3 @@ if gueltigkeiten[0] == True or False:
     # Fenster anzeigen
     fenster.mainloop()
     #}
-
