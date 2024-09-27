@@ -1,6 +1,34 @@
 import csv
 import tkinter as tk
 from tkinter import filedialog, messagebox
+import locale
+import os
+
+def lade_sprache():
+    """Lädt die Sprachdatei basierend auf der Windows-Spracheinstellung."""
+
+    # Sprache erkennen
+    sprache = locale.getdefaultlocale()[0][:2]  # z.B. 'de' oder 'en'
+    print(sprache)
+
+    # Sprachdatei laden
+    dateiname = f"./Sprache/{sprache}.txt"
+    if not os.path.exists(dateiname):
+        dateiname = "./Sprache/en.txt"  # Standardmäßig Deutsch laden
+    print(dateiname)
+
+    texte = {}
+    with open(dateiname, "r", encoding="utf-8") as f:
+        for zeile in f:
+            text_id, text = zeile.strip().split(" = ")
+            # Ersetze '\\n' durch tatsächliche Zeilenumbrüche
+            textt = text.replace("\\n", "\n")
+            texte[text_id] = textt
+            
+
+    return texte
+# Sprachdatei laden
+texte = lade_sprache()
 
 def remove_bom(header):
     """ Remove BOM from the header if present """
@@ -12,6 +40,7 @@ def compare_and_remove_duplicates():
     file2_path = filedialog.askopenfilename(title="Wähle die Neuen Leads aus", filetypes=[("CSV Dateien", "*.csv")])
 
     if not file1_path or not file2_path:
+        messagebox.showwarning(texte["warning_sign"], texte["select_two_files"])
         print("Bitte wähle zwei Dateien aus.")
         return
 
@@ -25,6 +54,7 @@ def compare_and_remove_duplicates():
             if header1 and "Firmenname" in header1:
                 index1 = header1.index("Firmenname")  # Find the index of the "Firmenname" column
             else:
+                
                 print('Header "Firmenname" nicht gefunden in Datei 1.')
                 return
 
@@ -51,6 +81,7 @@ def compare_and_remove_duplicates():
         # Save the updated CSV file without the entries from file 1
         save_path = filedialog.asksaveasfilename(defaultextension=".csv", title="Speichere die neue CSV-Datei", filetypes=[("CSV Dateien", "*.csv")])
         if not save_path:
+            messagebox.showwarning(texte["abort"], texte["save_abort"])
             print("Speichern abgebrochen.")
             return
 
@@ -63,7 +94,9 @@ def compare_and_remove_duplicates():
         # Display removed rows
         if removed_rows:
             # Update the result label with information about removed rows
+            messagebox.showwarning(texte["abort"], texte["save_erfolg"].format(len(file2_rows), len(file2_unique_rows), len(removed_rows)))
             print(f"Datei erfolgreich gespeichert!\nVorher: {len(file2_rows)} Zeilen, Nachher: {len(file2_unique_rows)}\n\nEntfernte Zeilen: {len(removed_rows)}")
 
     except Exception as e:
+        messagebox.showwarning(texte["error"], texte["error_01"].format(e))
         print(f"Ein Fehler ist aufgetreten: {e}")
