@@ -16,6 +16,7 @@ from tkinter import ttk
 from tkinter import messagebox
 from tkinter import filedialog
 from tkcalendar import Calendar
+import customtkinter as ctk
 import play
 import rec
 import threading
@@ -256,60 +257,64 @@ if gueltigkeiten[0] == True or False:
             return "f3", "f4"  # Gibt Standardwerte zurück
 
     # Hauptfenster erstellen
-    fenster = tk.Tk()
-    text=texte["fenster_titel"]
+    fenster = ctk.CTk()
+    text = texte["fenster_titel"]
     fenster.title(text)
-    fenster.geometry("400x400") 
+    if gueltigkeiten[1]:
+        fenster.geometry("430x340")
+    else:
+        fenster.geometry("410x400")
     fenster.iconbitmap("./Bilder/FIcon.ico")
 
-    # Frames erstellen
-    recorder_frame = ttk.LabelFrame(fenster, text=texte["aufnahme_titel"])
+    # Frames erstellen (Wir verwenden jetzt CTkFrames)
+    recorder_frame = ctk.CTkFrame(fenster, corner_radius=10)  # Etwas abgerundete Ecken
     recorder_frame.grid(row=0, column=0, padx=20, pady=20, sticky="nsew")
 
-    keybindings_frame = ttk.LabelFrame(fenster, text=texte["keybindings_label"])
+    keybindings_frame = ctk.CTkFrame(fenster, corner_radius=10)
     keybindings_frame.grid(row=1, column=0, padx=20, pady=20, sticky="nsew")
 
-    info_frame = ttk.LabelFrame(fenster, text=texte["info_label"])
+    info_frame = ctk.CTkFrame(fenster, corner_radius=10)
     info_frame.grid(row=0, column=1, padx=20, pady=20, sticky="nsew")
 
-    automation_frame = ttk.LabelFrame(fenster, text=texte["automation_label"])
+    automation_frame = ctk.CTkFrame(fenster, corner_radius=10)
     automation_frame.grid(row=1, column=1, padx=20, pady=20, sticky="nsew")
-    if gueltigkeiten[0] == True:
-     # Recorder-Elemente
-       ttk.Label(recorder_frame, text=texte["recorder_label"]).grid(row=0, column=0, padx=5, pady=5)
-       combobox = ttk.Combobox(recorder_frame, state="readonly")
-       combobox.grid(row=1, column=0, padx=5, pady=5)
-       combobox.bind("<Button-1>", populate_dropdown) 
-       combobox.bind("<<ComboboxSelected>>", on_select)
 
-       ttk.Button(recorder_frame, text=texte["rec_titel"], command=button_rec).grid(row=2, column=0, padx=5, pady=5)
-       ttk.Button(recorder_frame, text=texte["play_title"], command=button_play).grid(row=3, column=0, padx=5, pady=5)
+    # Recorder-Elemente (Wir verwenden jetzt CTkLabels und CTkButtons)
+    if gueltigkeiten[0]:
+        ctk.CTkLabel(recorder_frame, text=texte["recorder_label"]).grid(row=0, column=0, padx=5, pady=5)
+        combobox = ttk.Combobox(recorder_frame, state="readonly")  # Combobox bleibt von ttk
+        combobox.grid(row=1, column=0, padx=5, pady=5)
+        combobox.bind("<Button-1>", populate_dropdown)
+        combobox.bind("<<ComboboxSelected>>", on_select)
 
-       # Keybindings-Elemente
-       keybindings_frame = ttk.LabelFrame(fenster, text=texte["keybindings_label"])
-       keybindings_frame.grid(row=1, column=0, padx=20, pady=20, sticky="nsew")
-       ttk.Label(keybindings_frame, text=texte["pause_label"]).grid(row=0, column=0, padx=5, pady=5)
-        # ... (Rest der Keybindings-Elemente bleiben unverändert)
-       entry1 = ttk.Entry(keybindings_frame)
-       entry1.grid(row=0, column=1, padx=5, pady=5)
+        ctk.CTkButton(recorder_frame, text=texte["rec_titel"], command=button_rec).grid(row=2, column=0, padx=5, pady=5)
+        ctk.CTkButton(recorder_frame, text=texte["play_title"], command=button_play).grid(row=3, column=0, padx=5, pady=5)
+    else:
+        ctk.CTkLabel(recorder_frame, text=texte["rec_lizenz_ungueltig"]).grid(row=0, column=0, padx=20, pady=50)
 
-       ttk.Label(keybindings_frame, text=texte["stop_label"]).grid(row=1, column=0, padx=5, pady=5)
-       entry2 = ttk.Entry(keybindings_frame)
-       entry2.grid(row=1, column=1, padx=5, pady=5)
+    # Info-Elemente
+    ctk.CTkButton(info_frame, text=texte["lizenz_button"], command=button_lizenz).grid(row=0, column=0, padx=5, pady=5)
+    ctk.CTkButton(info_frame, text=texte["hilfe_button"], command=show_help).grid(row=1, column=0, padx=5, pady=5)
 
-       ttk.Button(keybindings_frame, text=texte["keybindings_speichern_button"], command=on_confirm).grid(row=2, column=0, columnspan=2, padx=5, pady=5)
+    # Keybindings-Elemente (Wir verwenden jetzt CTkLabels und CTkButtons)
+    ctk.CTkLabel(keybindings_frame, text=texte["pause_label"]).grid(row=0, column=0, padx=5, pady=5)
+    entry1 = ttk.Entry(keybindings_frame)  # Entry bleibt von ttk
+    entry1.grid(row=0, column=1, padx=5, pady=5)
 
-       # Info-Elemente
-       ttk.Button(info_frame, text=texte["lizenz_button"], command=button_lizenz).grid(row=0, column=0, padx=5, pady=5)
-       ttk.Button(info_frame, text=texte["hilfe_button"], command=show_help).grid(row=1, column=0, padx=5, pady=5)
+    ctk.CTkLabel(keybindings_frame, text=texte["stop_label"]).grid(row=1, column=0, padx=5, pady=5)
+    entry2 = ttk.Entry(keybindings_frame)
+    entry2.grid(row=1, column=1, padx=5, pady=5)
 
-    if gueltigkeiten[0] == True:
-       # Automation-Elemente (vorerst leer)
-       # ...
-       ttk.Button(automation_frame, text=texte["db_remove_dublicates"], command=button_dbverarbeiten).grid(row=0, column=0, padx=5, pady=5)
-       ttk.Button(automation_frame, text=texte["compare_csv"], command=button_ccsv).grid(row=1, column=0, padx=5, pady=5)
-       print("DB Lizenz Gültig!")
-       # Standardwerte laden und in die Eingabefelder setzen
+    ctk.CTkButton(keybindings_frame, text=texte["keybindings_speichern_button"], command=on_confirm).grid(row=2, column=0, columnspan=2, padx=5, pady=5)
+
+    # Automation-Elemente
+    if gueltigkeiten[1]:
+        ctk.CTkButton(automation_frame, text=texte["db_remove_dublicates"], command=button_dbverarbeiten).grid(row=0, column=0, padx=5, pady=5)
+        ctk.CTkButton(automation_frame, text=texte["compare_csv"], command=button_ccsv).grid(row=1, column=0, padx=5, pady=5)
+        print("DB Lizenz Gültig!")
+    else:
+        ctk.CTkLabel(automation_frame, text=texte["db_lizenz_ungueltig"]).grid(row=0, column=0, padx=5, pady=50)
+
     wert1, wert2 = lade_standardwerte()
 
     # Fenster anzeigen

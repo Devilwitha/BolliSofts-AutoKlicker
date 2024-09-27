@@ -4,7 +4,7 @@ from tkinter import filedialog
 
 def remove_duplicates():
     # Open file dialog to choose the CSV file to clean
-    input_csv = filedialog.askopenfilename(title="Wähle die Eingabe-CSV-Datei aus", filetypes=[("CSV-Dateien", "*.csv")])
+    input_csv = filedialog.askopenfilename(title="Wähle die Eingabe-CSV-Datei aus")
 
     if not input_csv:
         print("Bitte wähle eine CSV-Datei aus.")
@@ -44,4 +44,5 @@ def remove_duplicates():
         print(f"Datei erfolgreich bereinigt und gespeichert! Vorher: {len(rows)} Zeilen, Nachher: {len(unique_rows)} Zeilen")
 
     except Exception as e:
-        print(e)
+        print(f"Ein Fehler ist aufgetreten: {e}")
+

@@ -10,7 +10,6 @@ def compare_and_remove_duplicates():
     # File selection dialogs for both CSV files
     file1_path = filedialog.askopenfilename(title="Wähle die CRM Datei aus", filetypes=[("CSV Dateien", "*.csv")])
     file2_path = filedialog.askopenfilename(title="Wähle die Neuen Leads aus", filetypes=[("CSV Dateien", "*.csv")])
-    save_path = filedialog.asksaveasfilename(defaultextension=".csv", title="Speicher Ort der neuen CSV-Datei", filetypes=[("CSV Dateien", "*.csv")])
 
     if not file1_path or not file2_path:
         print("Bitte wähle zwei Dateien aus.")
@@ -49,7 +48,8 @@ def compare_and_remove_duplicates():
         file2_unique_rows = [row for row in file2_rows if row[index2] not in {r[index1] for r in file1_rows}]
         removed_rows = [row for row in file2_rows if row[index2] in {r[index1] for r in file1_rows}]  # Track removed rows
 
-        # Save the updated CSV file without the entries from file 
+        # Save the updated CSV file without the entries from file 1
+        save_path = filedialog.asksaveasfilename(defaultextension=".csv", title="Speichere die neue CSV-Datei", filetypes=[("CSV Dateien", "*.csv")])
         if not save_path:
             print("Speichern abgebrochen.")
             return
@@ -67,4 +67,3 @@ def compare_and_remove_duplicates():
 
     except Exception as e:
         print(f"Ein Fehler ist aufgetreten: {e}")
-
