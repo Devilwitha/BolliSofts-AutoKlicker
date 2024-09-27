@@ -8,6 +8,7 @@
 import sys
 sys.path.append('./DLL/Module/')
 sys.path.append('./DLL/Skripte/ScreenRec/')
+sys.path.append('./DLL/Skripte/DB/')
 from cryptography.fernet import Fernet
 from datetime import datetime, date
 import tkinter as tk
@@ -23,6 +24,10 @@ import time
 import keyboard
 import os
 import locale
+import csv
+import RD
+import CCsv
+
 
 selected_file=None
 wert1=None
@@ -118,7 +123,7 @@ datum_werte, gueltigkeiten = datum_aus_token_entschluesseln()
 #print(gueltigkeiten[1])
 
 if not any(gueltigkeiten):  # Prüfung, ob mindestens eine Lizenz gültig ist
-    print("Alle Lizenzen sind ungültig/abgelaufen!")
+    messagebox.showinfo(texte["lizenz_button"], texte["alle_lizenzen_ungueltig"])
 elif len(datum_werte) >= 3: 
     # Hier könntest du weitere Aktionen mit spezifischen Lizenzen durchführen,
     # falls nötig (z.B. datum_werte[1], datum_werte[2]) unter Berücksichtigung 
@@ -131,21 +136,30 @@ if gueltigkeiten[0] == True or False:
         try:
             global selected_file
             wert1, wert2 = lade_standardwerte()
-            messagebox.showinfo(f"Aufnahme", "Aufnahme wird nach dem bestätigen abgespielt\n["+wert2+"] um zu beenden")
+            messagebox.showinfo(texte["aufnahme_titel"], texte.get("aufnahme_nachricht", "aufnahme_nachricht nicht gefunden").format(wert2))
             play.play_actions("./Konfig/Recorder/"+selected_file, wert2)
         except:
-            messagebox.showwarning("Keine Aufnahmen", "Es wurde keine Konfiguration geladen oder es wurde noch keine erstellt.\nBitte zuerst eine Aufnahme erstellen!")
+            messagebox.showwarning(texte["keine_aufnahmen_titel"], texte["keine_aufnahmen_nachricht"])
+            
     def rec_actions_in_thread():
         wert1, wert2 = lade_standardwerte()
+        messagebox.showinfo(texte["rec_titel"], texte.get("rec_nachricht", "rec_nachricht nicht gefunden").format(wert1, wert2))
         rec.start_recording(wert1,wert2)
-        messagebox.showinfo("Rec", wert1+" Pause einfügen\n"+wert2+" Aufnahme beenden!")
+        
 
     def button_rec():
         rec_actions_in_thread()        
 
     def button_play():
         threading.Thread(target=play_actions_in_thread).start()
-
+       
+    def button_dbverarbeiten():
+        RD.remove_duplicates()
+        
+    def button_ccsv():
+        CCsv.compare_and_remove_duplicates()
+        
+        
     def button_lizenz():
         try:
             if len(datum_werte) > 1:
@@ -243,21 +257,22 @@ if gueltigkeiten[0] == True or False:
 
     # Hauptfenster erstellen
     fenster = tk.Tk()
-    fenster.title("BolliSoft's Auto-Klicker")
+    text=texte["fenster_titel"]
+    fenster.title(text)
     fenster.geometry("400x400") 
     fenster.iconbitmap("./Bilder/FIcon.ico")
 
     # Frames erstellen
-    recorder_frame = ttk.LabelFrame(fenster, text="Recorder")
+    recorder_frame = ttk.LabelFrame(fenster, text=texte["aufnahme_titel"])
     recorder_frame.grid(row=0, column=0, padx=20, pady=20, sticky="nsew")
 
-    keybindings_frame = ttk.LabelFrame(fenster, text="Keybindings")
+    keybindings_frame = ttk.LabelFrame(fenster, text=texte["keybindings_label"])
     keybindings_frame.grid(row=1, column=0, padx=20, pady=20, sticky="nsew")
 
-    info_frame = ttk.LabelFrame(fenster, text="Info")
+    info_frame = ttk.LabelFrame(fenster, text=texte["info_label"])
     info_frame.grid(row=0, column=1, padx=20, pady=20, sticky="nsew")
 
-    automation_frame = ttk.LabelFrame(fenster, text="Automation")
+    automation_frame = ttk.LabelFrame(fenster, text=texte["automation_label"])
     automation_frame.grid(row=1, column=1, padx=20, pady=20, sticky="nsew")
     if gueltigkeiten[0] == True:
      # Recorder-Elemente
@@ -267,8 +282,8 @@ if gueltigkeiten[0] == True or False:
        combobox.bind("<Button-1>", populate_dropdown) 
        combobox.bind("<<ComboboxSelected>>", on_select)
 
-       ttk.Button(recorder_frame, text="Rec", command=button_rec).grid(row=2, column=0, padx=5, pady=5)
-       ttk.Button(recorder_frame, text="Play", command=button_play).grid(row=3, column=0, padx=5, pady=5)
+       ttk.Button(recorder_frame, text=texte["rec_titel"], command=button_rec).grid(row=2, column=0, padx=5, pady=5)
+       ttk.Button(recorder_frame, text=texte["play_title"], command=button_play).grid(row=3, column=0, padx=5, pady=5)
 
        # Keybindings-Elemente
        keybindings_frame = ttk.LabelFrame(fenster, text=texte["keybindings_label"])
@@ -282,16 +297,18 @@ if gueltigkeiten[0] == True or False:
        entry2 = ttk.Entry(keybindings_frame)
        entry2.grid(row=1, column=1, padx=5, pady=5)
 
-       ttk.Button(keybindings_frame, text="Keybindings speichern", command=on_confirm).grid(row=2, column=0, columnspan=2, padx=5, pady=5)
+       ttk.Button(keybindings_frame, text=texte["keybindings_speichern_button"], command=on_confirm).grid(row=2, column=0, columnspan=2, padx=5, pady=5)
 
        # Info-Elemente
-       ttk.Button(info_frame, text="Lizenz", command=button_lizenz).grid(row=0, column=0, padx=5, pady=5)
-       ttk.Button(info_frame, text="Hilfe", command=show_help).grid(row=1, column=0, padx=5, pady=5)
+       ttk.Button(info_frame, text=texte["lizenz_button"], command=button_lizenz).grid(row=0, column=0, padx=5, pady=5)
+       ttk.Button(info_frame, text=texte["hilfe_button"], command=show_help).grid(row=1, column=0, padx=5, pady=5)
 
-    if gueltigkeiten[1] == True:
+    if gueltigkeiten[0] == True:
        # Automation-Elemente (vorerst leer)
        # ...
-       print("!")
+       ttk.Button(automation_frame, text=texte["db_remove_dublicates"], command=button_dbverarbeiten).grid(row=0, column=0, padx=5, pady=5)
+       ttk.Button(automation_frame, text=texte["compare_csv"], command=button_ccsv).grid(row=1, column=0, padx=5, pady=5)
+       print("DB Lizenz Gültig!")
        # Standardwerte laden und in die Eingabefelder setzen
     wert1, wert2 = lade_standardwerte()
 
