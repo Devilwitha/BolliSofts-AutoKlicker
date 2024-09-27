@@ -1,3 +1,10 @@
+##################################
+# Pogramm: CCsv skript           #
+# Code Version: 1.1              #
+# Code by BolliSoft              #
+# (c) by Nico Bollhalder & Lenny #
+##################################
+
 import csv
 import tkinter as tk
 from tkinter import filedialog, messagebox
@@ -38,6 +45,9 @@ def compare_and_remove_duplicates():
     # File selection dialogs for both CSV files
     file1_path = filedialog.askopenfilename(title="Wähle die CRM Datei aus", filetypes=[("CSV Dateien", "*.csv")])
     file2_path = filedialog.askopenfilename(title="Wähle die Neuen Leads aus", filetypes=[("CSV Dateien", "*.csv")])
+    if os.path.exists("cleanCSV.csv"):
+        os.remove("cleanCSV.csv")
+        print("Vorhandene 'cleanCSV.csv' gelöscht.")
 
     if not file1_path or not file2_path:
         messagebox.showwarning(texte["warning_sign"], texte["select_two_files"])
@@ -79,12 +89,12 @@ def compare_and_remove_duplicates():
         removed_rows = [row for row in file2_rows if row[index2] in {r[index1] for r in file1_rows}]  # Track removed rows
 
         # Save the updated CSV file without the entries from file 1
-        save_path = filedialog.asksaveasfilename(defaultextension=".csv", title="Speichere die neue CSV-Datei", filetypes=[("CSV Dateien", "*.csv")])
+        save_path = "./Exports/CSV/cleanCSV.csv"
         if not save_path:
             messagebox.showwarning(texte["abort"], texte["save_abort"])
             print("Speichern abgebrochen.")
             return
-
+    
         with open(save_path, 'w', newline='', encoding='utf-8') as outfile:
             writer = csv.writer(outfile)
             if header2:

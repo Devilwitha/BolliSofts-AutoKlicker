@@ -124,162 +124,191 @@ datum_werte, gueltigkeiten = datum_aus_token_entschluesseln()
 #print(gueltigkeiten[1])
 
 if not any(gueltigkeiten):  # Prüfung, ob mindestens eine Lizenz gültig ist
-    messagebox.showinfo(texte["lizenz_button"], texte["alle_lizenzen_ungueltig"])
+    print("!")#messagebox.showinfo(texte["lizenz_button"], texte["alle_lizenzen_ungueltig"])
 elif len(datum_werte) >= 3: 
     # Hier könntest du weitere Aktionen mit spezifischen Lizenzen durchführen,
     # falls nötig (z.B. datum_werte[1], datum_werte[2]) unter Berücksichtigung 
     # ihrer Gültigkeit aus der Liste 'gueltigkeiten'
     pass
     
-if gueltigkeiten[0] == True or False:
+
     #{
-    def play_actions_in_thread():
-        try:
-            global selected_file
-            wert1, wert2 = lade_standardwerte()
-            messagebox.showinfo(texte["aufnahme_titel"], texte.get("aufnahme_nachricht", "aufnahme_nachricht nicht gefunden").format(wert2))
-            play.play_actions("./Konfig/Recorder/"+selected_file, wert2)
-        except:
-            messagebox.showwarning(texte["keine_aufnahmen_titel"], texte["keine_aufnahmen_nachricht"])
-            
-    def rec_actions_in_thread():
-        wert1, wert2 = lade_standardwerte()
-        messagebox.showinfo(texte["rec_titel"], texte.get("rec_nachricht", "rec_nachricht nicht gefunden").format(wert1, wert2))
-        rec.start_recording(wert1,wert2)
-        
-
-    def button_rec():
-        rec_actions_in_thread()        
-
-    def button_play():
-        threading.Thread(target=play_actions_in_thread).start()
-       
-    def button_dbverarbeiten():
-        RD.remove_duplicates()
-        
-    def button_ccsv():
-        CCsv.compare_and_remove_duplicates()
-        
-        
-    def button_lizenz():
-        try:
-            if len(datum_werte) > 1:
-                messagebox.showinfo(texte["lizenz_titel"], texte["lizenz_nachricht_mehrere"].format(datum_werte[0], datum_werte[1]))
-            else:
-                messagebox.showinfo(texte["lizenz_titel"], texte["lizenz_nachricht"].format(datum_werte[0]))
-        except:
-            messagebox.showinfo(texte["lizenz_titel"], texte["lizenz_nachricht"].format(datum_werte[0]))
-
-    def populate_dropdown(event):
-        """Diese Funktion wird aufgerufen, wenn die Dropdown-Liste geöffnet wird. 
-        Sie durchsucht den ausgewählten Ordner und füllt die Dropdown-Liste."""
-        folder_path = "./Konfig/Recorder/"
-        if not folder_path:
-            return  # Benutzer hat abgebrochen
-
-        txt_files = [f for f in os.listdir(folder_path) if f.endswith('.txt')]
-        combobox['values'] = txt_files
-
-    def on_select(event):
+def play_actions_in_thread():
+    try:
         global selected_file
-        """Wird aufgerufen, wenn ein Element in der Dropdown-Liste ausgewählt wird."""
-        selected_file = combobox.get()
-        print("Ausgewählte Datei:", selected_file)
-
-    def show_help():
         wert1, wert2 = lade_standardwerte()
-        help_window = tk.Toplevel()
-        help_window.title(texte["hilfe_titel"])
-        help_window.iconbitmap("./Bilder/FIcon.ico")
+        messagebox.showinfo(texte["aufnahme_titel"], texte.get("aufnahme_nachricht", "aufnahme_nachricht nicht gefunden").format(wert2))
+        play.play_actions("./Konfig/Recorder/"+selected_file, wert2)
+    except:
+        messagebox.showwarning(texte["keine_aufnahmen_titel"], texte["keine_aufnahmen_nachricht"])
+            
+def rec_actions_in_thread():
+    wert1, wert2 = lade_standardwerte()
+    rec.start_recording(wert1,wert2)
+    messagebox.showinfo(texte["rec_titel"], texte.get("rec_nachricht", "rec_nachricht nicht gefunden"))
+        
 
-    # Hole den Hilfetext und ersetze Platzhalter
-        hilfe_text_mit_werten = texte.get("hilfe_text", "Hilfetext nicht gefunden").format(wert1, wert2)
+def button_rec():
+    rec_actions_in_thread()        
 
-    # Ersetze '\\n' durch tatsächliche Zeilenumbrüche
-        hilfe_text_mit_zeilenumbruechen = hilfe_text_mit_werten.replace("\\n", "\n")
+def button_play():
+    threading.Thread(target=play_actions_in_thread).start()
+       
+def button_dbverarbeiten():
+    RD.remove_duplicates()
+        
+def button_ccsv():
+    CCsv.compare_and_remove_duplicates()
+        
+def button_lizenzordner():
+    #result = messagebox.askquestion("Bestätigung", "Möchtest du den Lizenz Ordner öffnen?", icon='question')
+    #if result == 'yes':button_csvordner
+    open_folder(".\Lizenz")    
+
+def button_csvordner():
+    #result = messagebox.askquestion("Bestätigung", "Möchtest du den Lizenz Ordner öffnen?", icon='question')
+    #if result == 'yes':button_csvordner
+    open_folder(".\Exports\CSV")  
+    
+def button_aufnahmeordner():
+    #result = messagebox.askquestion("Bestätigung", "Möchtest du den Lizenz Ordner öffnen?", icon='question')
+    #if result == 'yes':
+    open_folder(".\Konfig\Recorder") 
+    
+def button_lizenz():
+    try:
+        if len(datum_werte) > 1:
+            messagebox.showinfo(texte["lizenz_titel"], texte["lizenz_nachricht_mehrere"].format(datum_werte[0], datum_werte[1]))
+        else:
+            messagebox.showinfo(texte["lizenz_titel"], texte["lizenz_nachricht"].format(datum_werte[0]))
+    except:
+        messagebox.showwarning(texte["lizenz_titel"], texte["nolizenz_nachricht"])
+
+def populate_dropdown(event):
+    """Diese Funktion wird aufgerufen, wenn die Dropdown-Liste geöffnet wird. 
+    Sie durchsucht den ausgewählten Ordner und füllt die Dropdown-Liste."""
+    folder_path = "./Konfig/Recorder/"
+    if not folder_path:
+        return  # Benutzer hat abgebrochen
+
+    txt_files = [f for f in os.listdir(folder_path) if f.endswith('.txt')]
+    combobox['values'] = txt_files
+
+def on_select(event):
+    global selected_file
+    """Wird aufgerufen, wenn ein Element in der Dropdown-Liste ausgewählt wird."""
+    selected_file = combobox.get()
+    print("Ausgewählte Datei:", selected_file)
+
+def show_help():
+    wert1, wert2 = lade_standardwerte()
+    help_window = tk.Toplevel()
+    help_window.title(texte["hilfe_titel"])
+    help_window.iconbitmap("./Bilder/FIcon.ico")
+
+# Hole den Hilfetext und ersetze Platzhalter
+    hilfe_text_mit_werten = texte.get("hilfe_text", "Hilfetext nicht gefunden").format(wert1, wert2)
+
+  # Ersetze '\\n' durch tatsächliche Zeilenumbrüche
+    hilfe_text_mit_zeilenumbruechen = hilfe_text_mit_werten.replace("\\n", "\n")
 
     # Label erstellen und als "rich text" behandeln
-        help_label = tk.Label(help_window, text=hilfe_text_mit_zeilenumbruechen, wraplength=350, justify='left')
-        help_label.pack(padx=20, pady=20)
+    help_label = tk.Label(help_window, text=hilfe_text_mit_zeilenumbruechen, wraplength=350, justify='left')
+    help_label.pack(padx=20, pady=20)
 
-        close_button = tk.Button(help_window, text="Schließen", command=help_window.destroy)
-        close_button.pack(padx=20, pady=20)
+    close_button = tk.Button(help_window, text="Schließen", command=help_window.destroy)
+    close_button.pack(padx=20, pady=20)
     
-    def on_confirm():
-        """
-        Diese Funktion wird aufgerufen, wenn der Bestätigungsbutton geklickt wird. 
-        Sie liest die Werte aus den Eingabefeldern, löscht ggf. eine bestehende "eingaben.txt" 
-        und schreibt die neuen Werte in die Datei.
-        """
-        value1 = entry1.get()
-        value2 = entry2.get()
+def open_folder(folder_path):
+    os.startfile(folder_path)
+    
+def on_confirm():
+    """
+    Diese Funktion wird aufgerufen, wenn der Bestätigungsbutton geklickt wird. 
+    Sie liest die Werte aus den Eingabefeldern, löscht ggf. eine bestehende "eingaben.txt" 
+    und schreibt die neuen Werte in die Datei.
+    """
+    value1 = entry1.get()
+    value2 = entry2.get()
+    # Überprüfen, ob die Datei existiert und ggf. löschen
+    if os.path.exists("./Konfig/Keybindings/Keybindings.txt"):
+        os.remove("./Konfig/Keybindings/Keybindings.txt")
 
-        # Überprüfen, ob die Datei existiert und ggf. löschen
-        if os.path.exists("./Konfig/Keybindings/Keybindings.txt"):
-            os.remove("./Konfig/Keybindings/Keybindings.txt")
+    # Datei öffnen und Eingaben schreiben
+    with open("./Konfig/Keybindings/Keybindings.txt", "w") as f:
+        f.write(f"Keybinding 1: {value1}\n")
+        f.write(f"Keybinding 2: {value2}\n")
 
-        # Datei öffnen und Eingaben schreiben
-        with open("./Konfig/Keybindings/Keybindings.txt", "w") as f:
-            f.write(f"Keybinding 1: {value1}\n")
-            f.write(f"Keybinding 2: {value2}\n")
+    #print("Eingaben wurden in 'Keybindings.txt' gespeichert.")
 
-        #print("Eingaben wurden in 'Keybindings.txt' gespeichert.")
+def lade_standardwerte():
+    global wert1, wert2
+    try:
+        with open("./Konfig/Keybindings/Keybindings.txt", "r") as f:
+            zeilen = f.readlines()
+            if len(zeilen) >= 2:
+                entry1.delete(0, tk.END) 
+                entry2.delete(0, tk.END) 
 
-    def lade_standardwerte():
-        global wert1, wert2
-        try:
-            with open("./Konfig/Keybindings/Keybindings.txt", "r") as f:
-                zeilen = f.readlines()
-                if len(zeilen) >= 2:
-                    entry1.delete(0, tk.END) 
-                    entry2.delete(0, tk.END) 
+                wert1 = zeilen[0].split(":")[1].strip()
+                wert2 = zeilen[1].split(":")[1].strip()
+                entry1.insert(0, wert1)
+                entry2.insert(0, wert2)
+                return wert1, wert2  # Gibt immer ein Tupel zurück
+            else:
+                raise ValueError("Datei enthält nicht genügend Werte")
+    except FileNotFoundError:
+        #print("Datei 'Keybindings.txt' nicht gefunden. Standardwerte werden verwendet.")
+        entry1.delete(0, tk.END) 
+        entry2.delete(0, tk.END) 
+        entry1.insert(0, "f3")
+        entry2.insert(0, "f4")
+        return "f3", "f4"  # Gibt Standardwerte zurück
+    except ValueError as e:
+        #print(f"Fehler beim Lesen der Werte: {e}. Standardwerte werden verwendet.")
+        entry1.delete(0, tk.END) 
+        entry2.delete(0, tk.END) 
+        entry1.insert(0, "f3")
+        entry2.insert(0, "f4")
+        return "f3", "f4"  # Gibt Standardwerte zurück
 
-                    wert1 = zeilen[0].split(":")[1].strip()
-                    wert2 = zeilen[1].split(":")[1].strip()
-                    entry1.insert(0, wert1)
-                    entry2.insert(0, wert2)
-                    return wert1, wert2  # Gibt immer ein Tupel zurück
-                else:
-                    raise ValueError("Datei enthält nicht genügend Werte")
-        except FileNotFoundError:
-            #print("Datei 'Keybindings.txt' nicht gefunden. Standardwerte werden verwendet.")
-            entry1.delete(0, tk.END) 
-            entry2.delete(0, tk.END) 
-            entry1.insert(0, "f3")
-            entry2.insert(0, "f4")
-            return "f3", "f4"  # Gibt Standardwerte zurück
-        except ValueError as e:
-            #print(f"Fehler beim Lesen der Werte: {e}. Standardwerte werden verwendet.")
-            entry1.delete(0, tk.END) 
-            entry2.delete(0, tk.END) 
-            entry1.insert(0, "f3")
-            entry2.insert(0, "f4")
-            return "f3", "f4"  # Gibt Standardwerte zurück
+# Hauptfenster erstellen
+fenster = ctk.CTk()
+text = texte["fenster_titel"]
+fenster.title(text)
 
-    # Hauptfenster erstellen
-    fenster = ctk.CTk()
-    text = texte["fenster_titel"]
-    fenster.title(text)
-    if gueltigkeiten[1]:
+#Lizenz Check Window Size
+try:
+    if gueltigkeiten[0] and gueltigkeiten[1]:  # Beide Lizenzen gültig
+        fenster.geometry("440x400")
+        print("Alle Lizenzen gültig Window")
+    elif gueltigkeiten[0]:  # Nur Rec Lizenz gültig
+        fenster.geometry("420x400")
+        print("Rec Lizenz only Window")
+    elif gueltigkeiten[1]:  # Nur DB Lizenz gültig
         fenster.geometry("430x340")
-    else:
-        fenster.geometry("410x400")
-    fenster.iconbitmap("./Bilder/FIcon.ico")
+        print("DB Lizenz only window")
+    else:  # Keine Lizenz gültig (implizit, kein `try-except` nötig)
+        fenster.geometry("420x340")  # Oder eine andere Standardgröße
+except:
+    fenster.geometry("420x340")  # Oder eine andere Standardgröße
 
-    # Frames erstellen (Wir verwenden jetzt CTkFrames)
-    recorder_frame = ctk.CTkFrame(fenster, corner_radius=10)  # Etwas abgerundete Ecken
-    recorder_frame.grid(row=0, column=0, padx=20, pady=20, sticky="nsew")
+fenster.iconbitmap("./Bilder/FIcon.ico")
+# Frames erstellen (Wir verwenden jetzt CTkFrames)
+recorder_frame = ctk.CTkFrame(fenster, corner_radius=10)  # Etwas abgerundete Ecken
+recorder_frame.grid(row=0, column=0, padx=20, pady=20, sticky="nsew")
 
-    keybindings_frame = ctk.CTkFrame(fenster, corner_radius=10)
-    keybindings_frame.grid(row=1, column=0, padx=20, pady=20, sticky="nsew")
+keybindings_frame = ctk.CTkFrame(fenster, corner_radius=10)
+keybindings_frame.grid(row=1, column=0, padx=20, pady=20, sticky="nsew")
 
-    info_frame = ctk.CTkFrame(fenster, corner_radius=10)
-    info_frame.grid(row=0, column=1, padx=20, pady=20, sticky="nsew")
+info_frame = ctk.CTkFrame(fenster, corner_radius=10)
+info_frame.grid(row=0, column=1, padx=20, pady=20, sticky="nsew")
 
-    automation_frame = ctk.CTkFrame(fenster, corner_radius=10)
-    automation_frame.grid(row=1, column=1, padx=20, pady=20, sticky="nsew")
+automation_frame = ctk.CTkFrame(fenster, corner_radius=10)
+automation_frame.grid(row=1, column=1, padx=20, pady=20, sticky="nsew")
 
-    # Recorder-Elemente (Wir verwenden jetzt CTkLabels und CTkButtons)
+# Recorder-Elemente (Wir verwenden jetzt CTkLabels und CTkButtons)
+try:
     if gueltigkeiten[0]:
         ctk.CTkLabel(recorder_frame, text=texte["recorder_label"]).grid(row=0, column=0, padx=5, pady=5)
         combobox = ttk.Combobox(recorder_frame, state="readonly")  # Combobox bleibt von ttk
@@ -287,36 +316,44 @@ if gueltigkeiten[0] == True or False:
         combobox.bind("<Button-1>", populate_dropdown)
         combobox.bind("<<ComboboxSelected>>", on_select)
 
-        ctk.CTkButton(recorder_frame, text=texte["rec_titel"], command=button_rec).grid(row=2, column=0, padx=5, pady=5)
-        ctk.CTkButton(recorder_frame, text=texte["play_title"], command=button_play).grid(row=3, column=0, padx=5, pady=5)
+        ctk.CTkButton(recorder_frame, text=texte["rec_titel"], command=button_rec).grid(row=2, column=0, columnspan=2, padx=20, pady=5)
+        ctk.CTkButton(recorder_frame, text=texte["play_title"], command=button_play).grid(row=3, column=0, columnspan=2, padx=20, pady=5)
+        ctk.CTkButton(recorder_frame, text=texte["aufnahmeordner_button"], command=button_aufnahmeordner).grid(row=4, column=0, columnspan=2, padx=20, pady=5)
     else:
-        ctk.CTkLabel(recorder_frame, text=texte["rec_lizenz_ungueltig"]).grid(row=0, column=0, padx=20, pady=50)
+        ctk.CTkLabel(recorder_frame, text=texte["rec_lizenz_abgelaufen"]).grid(row=0, column=0, padx=20, pady=50)
+except:
+    ctk.CTkLabel(recorder_frame, text=texte["rec_lizenz_ungueltig"]).grid(row=0, column=0, padx=20, pady=50)
 
-    # Info-Elemente
-    ctk.CTkButton(info_frame, text=texte["lizenz_button"], command=button_lizenz).grid(row=0, column=0, padx=5, pady=5)
-    ctk.CTkButton(info_frame, text=texte["hilfe_button"], command=show_help).grid(row=1, column=0, padx=5, pady=5)
+# Info-Elemente
+ctk.CTkButton(info_frame, text=texte["lizenz_button"], command=button_lizenz).grid(row=1, column=0, columnspan=2, padx=20, pady=20)
+ctk.CTkButton(info_frame, text=texte["hilfe_button"], command=show_help).grid(row=0, column=0, columnspan=2, padx=20, pady=20)
+ctk.CTkButton(info_frame, text=texte["lizenzordner_button"], command=button_lizenzordner).grid(row=2, column=0, columnspan=2, padx=20, pady=20)
 
-    # Keybindings-Elemente (Wir verwenden jetzt CTkLabels und CTkButtons)
-    ctk.CTkLabel(keybindings_frame, text=texte["pause_label"]).grid(row=0, column=0, padx=5, pady=5)
-    entry1 = ttk.Entry(keybindings_frame)  # Entry bleibt von ttk
-    entry1.grid(row=0, column=1, padx=5, pady=5)
+# Keybindings-Elemente (Wir verwenden jetzt CTkLabels und CTkButtons)
+ctk.CTkLabel(keybindings_frame, text=texte["pause_label"]).grid(row=0, column=0, padx=5, pady=5)
+entry1 = ttk.Entry(keybindings_frame)  # Entry bleibt von ttk
+entry1.grid(row=0, column=1, padx=5, pady=5)
 
-    ctk.CTkLabel(keybindings_frame, text=texte["stop_label"]).grid(row=1, column=0, padx=5, pady=5)
-    entry2 = ttk.Entry(keybindings_frame)
-    entry2.grid(row=1, column=1, padx=5, pady=5)
+ctk.CTkLabel(keybindings_frame, text=texte["stop_label"]).grid(row=1, column=0, padx=5, pady=5)
+entry2 = ttk.Entry(keybindings_frame)
+entry2.grid(row=1, column=1, padx=5, pady=5)
 
-    ctk.CTkButton(keybindings_frame, text=texte["keybindings_speichern_button"], command=on_confirm).grid(row=2, column=0, columnspan=2, padx=5, pady=5)
+ctk.CTkButton(keybindings_frame, text=texte["keybindings_speichern_button"], command=on_confirm).grid(row=2, column=0, columnspan=2, padx=5, pady=5)
 
-    # Automation-Elemente
+# Automation-Elemente
+try:
     if gueltigkeiten[1]:
-        ctk.CTkButton(automation_frame, text=texte["db_remove_dublicates"], command=button_dbverarbeiten).grid(row=0, column=0, padx=5, pady=5)
-        ctk.CTkButton(automation_frame, text=texte["compare_csv"], command=button_ccsv).grid(row=1, column=0, padx=5, pady=5)
+        ctk.CTkButton(automation_frame, text=texte["db_remove_dublicates"], command=button_dbverarbeiten).grid(row=1, column=0, columnspan=2, padx=5, pady=5)
+        ctk.CTkButton(automation_frame, text=texte["compare_csv"], command=button_ccsv).grid(row=0, column=0, columnspan=2, padx=5, pady=5)
+        ctk.CTkButton(automation_frame, text=texte["csvordner_button"], command=button_csvordner).grid(row=2, column=0, columnspan=2, padx=5, pady=5)
         print("DB Lizenz Gültig!")
     else:
-        ctk.CTkLabel(automation_frame, text=texte["db_lizenz_ungueltig"]).grid(row=0, column=0, padx=5, pady=50)
+        ctk.CTkLabel(automation_frame, text=texte["db_lizenz_abgelaufen"]).grid(row=0, column=0, padx=5, pady=50)
+except:
+    ctk.CTkLabel(automation_frame, text=texte["db_lizenz_ungueltig"]).grid(row=0, column=0, padx=5, pady=50)
+    
+wert1, wert2 = lade_standardwerte()
 
-    wert1, wert2 = lade_standardwerte()
-
-    # Fenster anzeigen
-    fenster.mainloop()
-    #}
+# Fenster anzeigen
+fenster.mainloop()
+#}

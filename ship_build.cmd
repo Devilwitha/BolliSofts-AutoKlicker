@@ -16,6 +16,9 @@ if %errorlevel% == 0 (
     if exist "%BUILD_DIR%\Lizenz\*" (
         del /q "%BUILD_DIR%\Lizenz\*"
     )
+	if exist "%BUILD_DIR%\Exports\*" (
+        del /q "%BUILD_DIR%\Exports\*"
+    )
 ) else (
     echo Fehler beim Bauen der Anwendung. Löschvorgänge wurden nicht ausgeführt.
     REM Hier könntest du weitere Fehlerbehandlung hinzufügen, um mehr Informationen über den Fehler zu erhalten.
