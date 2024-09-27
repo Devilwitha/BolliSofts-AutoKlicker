@@ -20,6 +20,7 @@ include_files = [
     os.path.join(project_dir, "Konfig"),
     os.path.join(project_dir, "Lizenz"),
     os.path.join(project_dir, "Bilder"),
+    os.path.join(project_dir, "Sprache"),
 ]
 
 # Definiere die Pakete, die inkludiert werden sollen
