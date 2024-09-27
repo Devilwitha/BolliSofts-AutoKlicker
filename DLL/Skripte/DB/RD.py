@@ -1,3 +1,10 @@
+##################################
+# Pogramm: RD Pogramm            #
+# Code Version: 1.1              #
+# Code by BolliSoft              #
+# (c) by Nico Bollhalder & Lenny #
+##################################
+
 import csv
 import tkinter as tk
 from tkinter import filedialog
@@ -32,7 +39,11 @@ texte = lade_sprache()
 
 def remove_duplicates():
     # Open file dialog to choose the CSV file to clean
-    input_csv = filedialog.askopenfilename(title="Wähle die Eingabe-CSV-Datei aus", filetypes=[("CSV Dateien", "*.csv")])
+    input_csv = "./Exports/CSV/cleanCSV.csv"
+    
+    if os.path.exists("mergeReady.csv"):
+        os.remove("mergeReady.csv")
+        print("Vorhandene 'mergeReady.csv' gelöscht.")
 
     if not input_csv:
         print("Bitte wähle eine CSV-Datei aus.")
@@ -57,7 +68,7 @@ def remove_duplicates():
                     seen.add(row[duplicate_column])
 
         # Open file dialog to save the cleaned CSV
-        output_csv = filedialog.asksaveasfilename(defaultextension=".csv", title="Speichere die bereinigte CSV-Datei", filetypes=[("CSV-Dateien", "*.csv")])
+        output_csv = "./Exports/CSV/mergeReady.csv"
         if not output_csv:
             messagebox.showwarning(texte["abort"], texte["save_abort"])
             print("Speichern abgebrochen.")
