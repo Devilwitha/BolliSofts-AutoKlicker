@@ -1,0 +1,15 @@
+cryptography
+datetime
+tkinter
+tkcalendar
+customtkinter
+pyautogui
+keyboard
+time
+locale
+csv
+threading
+six
+cx_Freeze
+pyinstaller
+customtkinter
