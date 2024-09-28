@@ -167,8 +167,13 @@ def button_dbverarbeiten():
 def button_ccsv():
     CCsv.compare_and_remove_duplicates()
     
+def button_stop_screenrec():
+    drec.stop_screen_rec()
+    ctk.CTkButton(screenrec_frame, text=texte["screenrec_button"], command=button_screenrec).grid(row=0, column=0, columnspan=2, padx=5, pady=5)
+    
 def button_screenrec():
-    drec.star_sreen_rec()
+    drec.start_screen_rec_threaded()
+    ctk.CTkButton(screenrec_frame, text=texte["stop_screenrec_button"], command=button_stop_screenrec).grid(row=0, column=0, columnspan=2, padx=5, pady=5)
 
 def button_kill_automation():
     shedule.stop_schedule()
@@ -194,6 +199,11 @@ def button_aufnahmeordner():
     #result = messagebox.askquestion("Bestätigung", "Möchtest du den Lizenz Ordner öffnen?", icon='question')
     #if result == 'yes':
     open_folder(".\Konfig\Recorder") 
+
+def button_videoordner():
+    #result = messagebox.askquestion("Bestätigung", "Möchtest du den Lizenz Ordner öffnen?", icon='question')
+    #if result == 'yes':
+    open_folder(".\Exports\Videos") 
     
 def button_lizenz():
     try:
@@ -369,12 +379,13 @@ entry2.grid(row=1, column=1, padx=5, pady=5)
 ctk.CTkButton(keybindings_frame, text=texte["keybindings_speichern_button"], command=on_confirm).grid(row=2, column=0, columnspan=2, padx=5, pady=5)
 
 ctk.CTkButton(screenrec_frame, text=texte["screenrec_button"], command=button_screenrec).grid(row=0, column=0, columnspan=2, padx=5, pady=5)
+ctk.CTkButton(screenrec_frame, text=texte["csvordner_button"], command=button_videoordner).grid(row=1, column=0, columnspan=2, padx=5, pady=5)
 
 # Automation-Elemente
 try:
     if gueltigkeiten[1]:
-        ctk.CTkButton(db_frame, text=texte["db_remove_dublicates"], command=button_dbverarbeiten).grid(row=1, column=0, columnspan=2, padx=5, pady=5)
-        ctk.CTkButton(db_frame, text=texte["compare_csv"], command=button_ccsv).grid(row=0, column=0, columnspan=2, padx=5, pady=5)
+        ctk.CTkButton(db_frame, text=texte["db_remove_dublicates"], command=button_dbverarbeiten).grid(row=0, column=0, columnspan=2, padx=5, pady=5)
+        ctk.CTkButton(db_frame, text=texte["compare_csv"], command=button_ccsv).grid(row=1, column=0, columnspan=2, padx=5, pady=5)
         ctk.CTkButton(db_frame, text=texte["csvordner_button"], command=button_csvordner).grid(row=2, column=0, columnspan=2, padx=5, pady=5)
         print("DB Lizenz Gültig!")
     else:

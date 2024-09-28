@@ -8,6 +8,7 @@
 import csv
 import tkinter as tk
 from tkinter import filedialog
+from tkinter import messagebox
 import locale
 import os
 
@@ -39,7 +40,7 @@ texte = lade_sprache()
 
 def remove_duplicates():
     # Open file dialog to choose the CSV file to clean
-    input_csv = "./Exports/CSV/cleanCSV.csv"
+    input_csv = filedialog.askopenfilename(title="CSV wählen",initialdir="~/Downloads", filetypes=[("CSV Dateien", "*.csv")])
     
     if os.path.exists("mergeReady.csv"):
         os.remove("mergeReady.csv")

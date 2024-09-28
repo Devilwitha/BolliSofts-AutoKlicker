@@ -45,3 +45,4 @@ csvordner_button = Ordner öffnen
 automation_button = Automation Starten
 kill_automation_button = Automation  Stopen 
 screenrec_button = Bildschirm aufnahme
+stop_screenrec_button = Aufnahme    beenden
