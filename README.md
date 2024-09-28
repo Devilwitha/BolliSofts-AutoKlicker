@@ -1,8 +1,4 @@
-# BolliSofts-AutoKlicker
 
-**Code-Version**
-
-1.3
 
 **Autor**
 
@@ -89,3 +85,5 @@ Nico Bollhalder (BolliSoft)
 *   Wenn das Programm nicht startet, überprüfen Sie die Lizenzdateien und deren Gültigkeit.
 *   Wenn Funktionen nicht verfügbar sind, stellen Sie sicher, dass Sie die entsprechende Lizenz besitzen.
 *   Bei anderen Problemen konsultieren Sie die Hilfe oder wenden Sie sich an den Entwickler.
+
+**Zusammenfassung:** BolliSofts-AutoKlicker ist ein leistungsstarkes Automatisierungstool mit einer Vielzahl von Funktionen. Es ist einfach zu bedienen und bietet Flexibilität bei der Anpassung der Tastenkombinationen. Mit den richtigen Lizenzen kannst du das Programm optimal nutzen und deine Arbeitsabläufe effizienter gestalten.
