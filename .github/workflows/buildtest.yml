@@ -23,15 +23,23 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt 
-          pip install cx_Freeze
+          pip install pyinstaller 
 
-      - name: Build with cx_Freeze (using setup.py)
+      - name: Build with PyInstaller
         run: |
-          python setup.py build
+          pyinstaller main.py --onefile 
+
+      - name: Create build folder
+        run: |
+          Remove-Item build -Recurse -Force  # Ordner löschen, falls vorhanden
+          mkdir build
+          cp -r dist/* build\ 
+          if (Test-Path config.txt) { copy config.txt build\ }
+          if (Test-Path images) { copy /s /e images build\ } 
 
       - name: Create archive
         run: |
-          7z a build.zip build\exe.win32-3.x  # Zip the entire 'build\exe.win32-3.x' folder
+          7z a build.zip build  # Zip the entire 'build' folder
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
