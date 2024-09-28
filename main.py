@@ -9,6 +9,8 @@ import sys
 sys.path.append('./DLL/Module/')
 sys.path.append('./DLL/Skripte/ScreenRec/')
 sys.path.append('./DLL/Skripte/DB/')
+sys.path.append('./DLL/Skripte/Auto/')
+sys.path.append('./DLL/Skripte/DRec/')
 from cryptography.fernet import Fernet
 from datetime import datetime, date
 import tkinter as tk
@@ -28,6 +30,11 @@ import locale
 import csv
 import RD
 import CCsv
+import shedule
+import schedule
+import displayrec as drec
+import cv2
+
 
 
 selected_file=None
@@ -159,7 +166,20 @@ def button_dbverarbeiten():
         
 def button_ccsv():
     CCsv.compare_and_remove_duplicates()
-        
+    
+def button_screenrec():
+    drec.star_sreen_rec()
+
+def button_kill_automation():
+    shedule.stop_schedule()
+    print("Erstelle CTkButton für Automation")  # Debugging-Ausgabe
+    ctk.CTkButton(automation_frame, text=texte["automation_button"], command=button_automation).grid(row=0, column=0, columnspan=2, padx=5, pady=5)
+
+def button_automation():
+    shedule.start_schedule()
+    print("Erstelle CTkButton für Kill Automation")  # Debugging-Ausgabe
+    ctk.CTkButton(automation_frame, text=texte["kill_automation_button"], command=button_kill_automation).grid(row=0, column=0, columnspan=2, padx=5, pady=5)
+    
 def button_lizenzordner():
     #result = messagebox.askquestion("Bestätigung", "Möchtest du den Lizenz Ordner öffnen?", icon='question')
     #if result == 'yes':button_csvordner
@@ -240,7 +260,6 @@ def on_confirm():
         f.write(f"Keybinding 2: {value2}\n")
 
     #print("Eingaben wurden in 'Keybindings.txt' gespeichert.")
-
 def lade_standardwerte():
     global wert1, wert2
     try:
@@ -280,7 +299,7 @@ fenster.title(text)
 #Lizenz Check Window Size
 try:
     if gueltigkeiten[0] and gueltigkeiten[1]:  # Beide Lizenzen gültig
-        fenster.geometry("440x400")
+        fenster.geometry("650x400")
         print("Alle Lizenzen gültig Window")
     elif gueltigkeiten[0]:  # Nur Rec Lizenz gültig
         fenster.geometry("420x400")
@@ -302,10 +321,16 @@ keybindings_frame = ctk.CTkFrame(fenster, corner_radius=10)
 keybindings_frame.grid(row=1, column=0, padx=20, pady=20, sticky="nsew")
 
 info_frame = ctk.CTkFrame(fenster, corner_radius=10)
-info_frame.grid(row=0, column=1, padx=20, pady=20, sticky="nsew")
+info_frame.grid(row=0, column=2, padx=20, pady=20, sticky="nsew")
+
+db_frame = ctk.CTkFrame(fenster, corner_radius=10)
+db_frame.grid(row=1, column=1, padx=20, pady=20, sticky="nsew")
 
 automation_frame = ctk.CTkFrame(fenster, corner_radius=10)
-automation_frame.grid(row=1, column=1, padx=20, pady=20, sticky="nsew")
+automation_frame.grid(row=0, column=1, padx=20, pady=20, sticky="nsew")
+
+screenrec_frame = ctk.CTkFrame(fenster, corner_radius=10)
+screenrec_frame.grid(row=1, column=2, padx=20, pady=20, sticky="nsew")
 
 # Recorder-Elemente (Wir verwenden jetzt CTkLabels und CTkButtons)
 try:
@@ -319,10 +344,13 @@ try:
         ctk.CTkButton(recorder_frame, text=texte["rec_titel"], command=button_rec).grid(row=2, column=0, columnspan=2, padx=20, pady=5)
         ctk.CTkButton(recorder_frame, text=texte["play_title"], command=button_play).grid(row=3, column=0, columnspan=2, padx=20, pady=5)
         ctk.CTkButton(recorder_frame, text=texte["aufnahmeordner_button"], command=button_aufnahmeordner).grid(row=4, column=0, columnspan=2, padx=20, pady=5)
+        ctk.CTkButton(automation_frame, text=texte["automation_button"], command=button_automation).grid(row=0, column=0, columnspan=2, padx=5, pady=5)
     else:
         ctk.CTkLabel(recorder_frame, text=texte["rec_lizenz_abgelaufen"]).grid(row=0, column=0, padx=20, pady=50)
+        ctk.CTkLabel(automation_frame, text=texte["rec_lizenz_abgelaufen"]).grid(row=0, column=0, columnspan=2, padx=20, pady=50)
 except:
     ctk.CTkLabel(recorder_frame, text=texte["rec_lizenz_ungueltig"]).grid(row=0, column=0, padx=20, pady=50)
+    ctk.CTkLabel(automation_frame).grid(row=0, column=0, columnspan=2, padx=20, pady=50)
 
 # Info-Elemente
 ctk.CTkButton(info_frame, text=texte["lizenz_button"], command=button_lizenz).grid(row=1, column=0, columnspan=2, padx=20, pady=20)
@@ -340,17 +368,19 @@ entry2.grid(row=1, column=1, padx=5, pady=5)
 
 ctk.CTkButton(keybindings_frame, text=texte["keybindings_speichern_button"], command=on_confirm).grid(row=2, column=0, columnspan=2, padx=5, pady=5)
 
+ctk.CTkButton(screenrec_frame, text=texte["screenrec_button"], command=button_screenrec).grid(row=0, column=0, columnspan=2, padx=5, pady=5)
+
 # Automation-Elemente
 try:
     if gueltigkeiten[1]:
-        ctk.CTkButton(automation_frame, text=texte["db_remove_dublicates"], command=button_dbverarbeiten).grid(row=1, column=0, columnspan=2, padx=5, pady=5)
-        ctk.CTkButton(automation_frame, text=texte["compare_csv"], command=button_ccsv).grid(row=0, column=0, columnspan=2, padx=5, pady=5)
-        ctk.CTkButton(automation_frame, text=texte["csvordner_button"], command=button_csvordner).grid(row=2, column=0, columnspan=2, padx=5, pady=5)
+        ctk.CTkButton(db_frame, text=texte["db_remove_dublicates"], command=button_dbverarbeiten).grid(row=1, column=0, columnspan=2, padx=5, pady=5)
+        ctk.CTkButton(db_frame, text=texte["compare_csv"], command=button_ccsv).grid(row=0, column=0, columnspan=2, padx=5, pady=5)
+        ctk.CTkButton(db_frame, text=texte["csvordner_button"], command=button_csvordner).grid(row=2, column=0, columnspan=2, padx=5, pady=5)
         print("DB Lizenz Gültig!")
     else:
-        ctk.CTkLabel(automation_frame, text=texte["db_lizenz_abgelaufen"]).grid(row=0, column=0, padx=5, pady=50)
+        ctk.CTkLabel(db_frame, text=texte["db_lizenz_abgelaufen"]).grid(row=0, column=0, padx=5, pady=50)
 except:
-    ctk.CTkLabel(automation_frame, text=texte["db_lizenz_ungueltig"]).grid(row=0, column=0, padx=5, pady=50)
+    ctk.CTkLabel(db_frame, text=texte["db_lizenz_ungueltig"]).grid(row=0, column=0, padx=5, pady=50)
     
 wert1, wert2 = lade_standardwerte()
 
