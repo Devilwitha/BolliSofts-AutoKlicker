@@ -1,89 +1,63 @@
+# BolliSofts-AutoKlicker
 
+**Ein vielseitiges Automatisierungstool zur Aufzeichnung, Wiedergabe und Automatisierung von Aktionen auf deinem Computer.**
 
-**Autor**
+## Hauptfunktionen:
 
-Nico Bollhalder (BolliSoft)
+* **Recorder:** 
+    * Zeichne Maus- und Tastaturaktionen auf und spiele sie präzise wieder ab. 
+    * Wähle aus einer Liste gespeicherter Aufnahmen und starte sie bei Bedarf.
 
-**Lizenz**
+* **Keybindings:** 
+    * Passe die Tastenkombinationen für "Pause" und "Stopp" nach deinen Wünschen an.
 
-(c) by Nico Bollhalder
+* **Automation:** (erfordert Lizenz)
+    * Erweiterte Funktionen zur Datenbankverwaltung und zum CSV-Vergleich.
+    * Optimiere deine Arbeitsabläufe durch Automatisierung sich wiederholender Aufgaben
 
-**Funktionsweise**
+* **Screen Recorder:** 
+    * Nimm deinen Bildschirm auf und speichere die Videos für Präsentationen, Tutorials oder andere Zwecke
 
-1.  **Lizenzprüfung:**
-    *   Das Programm beginnt mit der Entschlüsselung und Überprüfung der Lizenzdatei.
-    *   Wenn keine Lizenzen gültig sind, wird eine entsprechende Meldung angezeigt.
-    *   Die Gültigkeit der Lizenzen bestimmt, welche Funktionen verfügbar sind.
+* **Datenbank & CSV:** (erfordert Lizenz)
+    * Entferne Duplikate aus deiner Datenbank.
+    * Vergleiche CSV-Dateien und identifiziere/entferne Duplikate für eine saubere Datenbasis
 
-2.  **Sprachdatei laden:**
-    *   Die passende Sprachdatei wird basierend auf den Windows-Spracheinstellungen geladen.
-    *   Die Texte aus der Sprachdatei werden im Programm verwendet.
+## Lizenzierung:
 
-3.  **Hauptfenster:**
-    *   Das Hauptfenster wird erstellt und in verschiedene Bereiche (Frames) unterteilt.
-    *   Die verfügbaren Funktionen werden je nach Lizenzstatus angezeigt.
+* Bestimmte Funktionen sind lizenzpflichtig. 
+* Gültige Lizenzen sind erforderlich, um alle Funktionen nutzen zu können
+* Das Programm überprüft Lizenzen beim Start und informiert über fehlende oder abgelaufene Lizenzen
 
-4.  **Recorder:**
-    *   Ermöglicht die Auswahl einer Aufnahmedatei aus einem Dropdown-Menü.
-    *   Die Schaltflächen "Aufnahme" und "Wiedergabe" starten die entsprechenden Aktionen.
+## Benutzeroberfläche:
 
-5.  **Info:**
-    *   Die Schaltfläche "Lizenz" zeigt Informationen zur Lizenz an.
-    *   Die Schaltfläche "Hilfe" öffnet ein Fenster mit einer Anleitung.
+* Benutzerfreundliche Oberfläche mit übersichtlichen Bereichen für die verschiedenen Funktionen
+* Die verfügbaren Funktionen werden je nach Lizenzstatus angezeigt
 
-6.  **Keybindings:**
-    *   Ermöglicht die Anpassung der Tastenkombinationen für "Pause" und "Stopp".
-    *   Die Änderungen werden in einer Konfigurationsdatei gespeichert.
+## Abhängigkeiten:
 
-7.  **Automation:**
-    *   Bietet Funktionen zur Datenbankverwaltung und zum CSV-Vergleich, falls die entsprechende Lizenz gültig ist.
+* Python-Module: `cryptography`, `tkinter`, `pyautogui`, etc
+* Stelle sicher, dass diese Module installiert sind, bevor du das Programm ausführst
 
-**Abhängigkeiten**
+## Verwendung:
 
-*   **Python-Module:**
-    *   `cryptography`
-    *   `datetime`
-    *   `tkinter`
-    *   `ttk`
-    *   `messagebox`
-    *   `filedialog`
-    *   `tkcalendar`
-    *   `customtkinter`
-    *   `play`
-    *   `rec`
-    *   `threading`
-    *   `pyautogui`
-    *   `time`
-    *   `keyboard`
-    *   `os`
-    *   `locale`
-    *   `csv`
-    *   `RD`
-    *   `CCsv`
+1. Besorge dir gültige Lizenzdateien, um alle Funktionen freizuschalten
+2. Passe die Tastenkombinationen nach Bedarf an
+3. Wähle eine Aufnahmedatei und nutze "Aufnahme" & "Wiedergabe"
+4. Nutze die erweiterten Funktionen (Datenbank, CSV) bei vorhandener Lizenz
+5. Nimm deinen Bildschirm auf und verwalte deine Videos
+6. Optimiere deine Daten mit den Datenbank- und CSV-Funktionen
 
-**Konfiguration**
+## Hinweis:
 
-*   **Lizenzdatei:** `./Lizenz/Lizenz.key` und `./Lizenz/_Lizenz.enc`
-*   **Sprachdateien:** `./Sprache/xx.txt` (wobei 'xx' der Sprachcode ist)
-*   **Aufnahmedateien:** `./Konfig/Recorder/`
-*   **Keybindings:** `./Konfig/Keybindings/Keybindings.txt`
+* Die Verfügbarkeit bestimmter Funktionen hängt von den gültigen Lizenzen ab
+* Detaillierte Anweisungen findest du in der Hilfe im Programm
 
-**Verwendung**
+## Fehlerbehebung
 
-1.  Stellen Sie sicher, dass Sie gültige Lizenzdateien haben.
-2.  Passen Sie bei Bedarf die Tastenkombinationen an.
-3.  Wählen Sie eine Aufnahmedatei aus und verwenden Sie die Schaltflächen "Aufnahme" und "Wiedergabe".
-4.  Nutzen Sie die Funktionen zur Datenbankverwaltung und zum CSV-Vergleich, falls verfügbar.
+* Programm startet nicht? Überprüfe die Lizenzdateien und deren Gültigkeit
+* Funktionen nicht verfügbar? Stelle sicher, dass du die entsprechende Lizenz besitzt
+* Bei anderen Problemen konsultiere die Hilfe oder kontaktiere den Entwickler
 
-**Hinweis:**
+## Zusammenfassung
 
-*   Die Verfügbarkeit bestimmter Funktionen hängt von den gültigen Lizenzen ab.
-*   Lesen Sie die Hilfe für detaillierte Anweisungen zur Verwendung des Programms.
-
-**Fehlerbehebung**
-
-*   Wenn das Programm nicht startet, überprüfen Sie die Lizenzdateien und deren Gültigkeit.
-*   Wenn Funktionen nicht verfügbar sind, stellen Sie sicher, dass Sie die entsprechende Lizenz besitzen.
-*   Bei anderen Problemen konsultieren Sie die Hilfe oder wenden Sie sich an den Entwickler.
-
-**Zusammenfassung:** BolliSofts-AutoKlicker ist ein leistungsstarkes Automatisierungstool mit einer Vielzahl von Funktionen. Es ist einfach zu bedienen und bietet Flexibilität bei der Anpassung der Tastenkombinationen. Mit den richtigen Lizenzen kannst du das Programm optimal nutzen und deine Arbeitsabläufe effizienter gestalten.
+**BolliSofts-AutoKlicker** ist ein leistungsstarkes und benutzerfreundliches Automatisierungstool. Es bietet Flexibilität und Effizienz für deine Arbeitsabläufe. Sichere dir die passenden Lizenzen, um das volle Potenzial des Programms auszuschöpfen!
