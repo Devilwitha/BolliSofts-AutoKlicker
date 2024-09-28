@@ -310,7 +310,7 @@ try:
     else:  # Keine Lizenz gültig (implizit, kein `try-except` nötig)
         fenster.geometry("420x340")  # Oder eine andere Standardgröße
 except:
-    fenster.geometry("420x340")  # Oder eine andere Standardgröße
+    fenster.geometry("650x400")  # Oder eine andere Standardgröße
 
 fenster.iconbitmap("./Bilder/FIcon.ico")
 # Frames erstellen (Wir verwenden jetzt CTkFrames)
@@ -350,7 +350,7 @@ try:
         ctk.CTkLabel(automation_frame, text=texte["rec_lizenz_abgelaufen"]).grid(row=0, column=0, columnspan=2, padx=20, pady=50)
 except:
     ctk.CTkLabel(recorder_frame, text=texte["rec_lizenz_ungueltig"]).grid(row=0, column=0, padx=20, pady=50)
-    ctk.CTkLabel(automation_frame).grid(row=0, column=0, columnspan=2, padx=20, pady=50)
+    ctk.CTkLabel(automation_frame, text=texte["rec_lizenz_ungueltig"]).grid(row=0, column=0, columnspan=2, padx=20, pady=50)
 
 # Info-Elemente
 ctk.CTkButton(info_frame, text=texte["lizenz_button"], command=button_lizenz).grid(row=1, column=0, columnspan=2, padx=20, pady=20)

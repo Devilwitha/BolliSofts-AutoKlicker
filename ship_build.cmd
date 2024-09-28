@@ -16,8 +16,11 @@ if %errorlevel% == 0 (
     if exist "%BUILD_DIR%\Lizenz\*" (
         del /q "%BUILD_DIR%\Lizenz\*"
     )
-	if exist "%BUILD_DIR%\Exports\*" (
-        del /q "%BUILD_DIR%\Exports\*"
+	if exist "%BUILD_DIR%\Exports\CSV\*" (
+        del /q "%BUILD_DIR%\Exports\CSV\*"
+    )
+	if exist "%BUILD_DIR%\Exports\Videos\*" (
+        del /q "%BUILD_DIR%\Exports\Videos\*"
     )
 ) else (
     echo Fehler beim Bauen der Anwendung. Löschvorgänge wurden nicht ausgeführt.
