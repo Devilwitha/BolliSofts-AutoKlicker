@@ -1,9 +1,5 @@
 # BolliSofts-AutoKlicker
 
-**Code-Version**
-
-1.3
-
 **Autor**
 
 Nico Bollhalder (BolliSoft)
