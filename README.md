@@ -38,6 +38,8 @@
 * Python-Module: `cryptography`, `tkinter`, `pyautogui`, etc
 * Stelle sicher, dass diese Module installiert sind, bevor du das Programm ausführst
 
+
+
 ## Verwendung:
 
 1. Besorge dir gültige Lizenzdateien, um alle Funktionen freizuschalten
