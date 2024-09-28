@@ -42,3 +42,6 @@ lizenzordner_button = Lizenz Ordner öffnen
 nolizenz_nachricht = Sie Besitzen noch keine Lizenz bitte wenden sie sich an \n\nE-Mail: nico.bollhalder22@gmail.com\n\n
 aufnahmeordner_button = Ordner öffnen
 csvordner_button = Ordner öffnen
+automation_button = Automation Starten
+kill_automation_button = Automation  Stopen 
+screenrec_button = Bildschirm aufnahme

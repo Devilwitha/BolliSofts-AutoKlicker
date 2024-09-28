@@ -13,3 +13,5 @@ six
 cx_Freeze
 pyinstaller
 customtkinter
+schedule
+opencv-python
