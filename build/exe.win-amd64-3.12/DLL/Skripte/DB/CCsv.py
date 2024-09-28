@@ -43,8 +43,8 @@ def remove_bom(header):
 
 def compare_and_remove_duplicates():
     # File selection dialogs for both CSV files
-    file1_path = filedialog.askopenfilename(title="Wähle die CRM Datei aus", filetypes=[("CSV Dateien", "*.csv")])
-    file2_path = filedialog.askopenfilename(title="Wähle die Neuen Leads aus", filetypes=[("CSV Dateien", "*.csv")])
+    file1_path = filedialog.askopenfilename(title="Wähle die CRM Datei aus",initialdir="~/Downloads", filetypes=[("CSV Dateien", "*.csv")])
+    file2_path = filedialog.askopenfilename(title="Wähle die Neuen Leads aus",initialdir="./Exports/CSV/", filetypes=[("CSV Dateien", "*.csv")])
     if os.path.exists("cleanCSV.csv"):
         os.remove("cleanCSV.csv")
         print("Vorhandene 'cleanCSV.csv' gelöscht.")
