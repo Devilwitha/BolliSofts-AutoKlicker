@@ -118,6 +118,37 @@ def datum_aus_token_entschluesseln(schluessel_datei="./Lizenz/Lizenz.key", token
 
     return datum_werte, gueltigkeiten
 
+def speichere_shedule_time(texte, dateiname="./Konfig/Automation/shedule_time.txt"):
+    """Speichert die Sprachdaten in die angegebene Datei."""
+    with open(dateiname, "w", encoding="utf-8") as f:
+        for text_id, text in texte.items():
+            # Ersetze Zeilenumbrüche durch '\\n' für die Speicherung
+            text_escaped = text.replace("\n", "\\n")
+            f.write(f"{text_id} = {text_escaped}\n")
+
+def lade_shedule_time():
+    """Lädt die Sprachdatei basierend auf der Windows-Spracheinstellung."""
+
+    # Sprachdatei laden
+    dateiname = f"./Konfig/Automation/shedule_time.txt"
+    d = (dateiname)
+    Log.log(logfile, d)  # Ich nehme an, 'Log' und 'logfile' sind bereits definiert
+
+    texte = {}
+    with open(dateiname, "r", encoding="utf-8") as f:
+        for zeile in f:
+            try:
+                text_id, text = zeile.strip().split(" = ")
+                # Ersetze '\\n' durch tatsächliche Zeilenumbrüche
+                text = text.replace("\\n", "\n")
+                texte[text_id] = text
+                Log.log(logfile, text) # Optional: Loggen des eingelesenen Textes
+            except ValueError:
+                print(f"Ungültiges Format in Zeile: {zeile}")
+                continue  # Überspringe diese Zeile
+
+    return texte
+
 def lade_sprache():
     """Lädt die Sprachdatei basierend auf der Windows-Spracheinstellung."""
 
@@ -234,7 +265,9 @@ def button_kill_automation():
 def button_automation():
     d = "Button: button_automation"
     Log.log(logfile, d)
-    shedule.start_schedule()
+    t = lade_shedule_time()
+    t= (t["stunde"]+":"+t["minute"])
+    shedule.start_schedule(t)
     Log.log(logfile, "Erstelle CTkButton für Kill Automation")  # Debugging-Ausgabe
     ctk.CTkButton(automation_frame, text=texte["kill_automation_button"], command=button_kill_automation).grid(row=0, column=0, columnspan=2, padx=5, pady=5)
     
@@ -298,6 +331,11 @@ def on_select(event):
     selected_file = combobox.get()
     d = ("Ausgewählte Datei:", selected_file)
     Log.log(logfile, d)
+
+def uebernehmen_zeit():
+    ausgewaehlte_zeit = time_picker.get()
+    print(f"Ausgewählte Zeit: {ausgewaehlte_zeit}")
+    # Hier kannst du die ausgewählte Zeit weiterverarbeiten
 
 def show_help():
     d = "Help wird geöffnet"
@@ -398,7 +436,7 @@ d = "Lizenz Check Window Size"
 Log.log(logfile, d)
 try:
     if gueltigkeiten[0] and gueltigkeiten[1]:  # Beide Lizenzen gültig
-        xy = ("650x400")
+        xy = ("800x400")
         d=("Alle Lizenzen gültig Window")
     elif gueltigkeiten[0]:  # Nur Rec Lizenz gültig
         xy = ("420x400")
@@ -437,6 +475,10 @@ automation_frame.grid(row=0, column=1, padx=20, pady=20, sticky="nsew")
 screenrec_frame = ctk.CTkFrame(fenster, corner_radius=10)
 screenrec_frame.grid(row=1, column=2, padx=20, pady=20, sticky="nsew")
 
+timepicker_frame = ctk.CTkFrame(automation_frame, corner_radius=10)
+timepicker_frame.grid(row=1, column=0, columnspan=2, padx=5, pady=5)
+
+
 # Recorder-Elemente (Wir verwenden jetzt CTkLabels und CTkButtons)
 try:
     if gueltigkeiten[0]:
@@ -450,6 +492,26 @@ try:
         ctk.CTkButton(recorder_frame, text=texte["play_title"], command=button_play).grid(row=3, column=0, columnspan=2, padx=20, pady=5)
         ctk.CTkButton(recorder_frame, text=texte["aufnahmeordner_button"], command=button_aufnahmeordner).grid(row=4, column=0, columnspan=2, padx=20, pady=5)
         ctk.CTkButton(automation_frame, text=texte["automation_button"], command=button_automation).grid(row=0, column=0, columnspan=2, padx=5, pady=5)
+
+
+        # Stunden-Combobox
+        stunden_combobox = ttk.Combobox(timepicker_frame, values=[f"{i:02d}" for i in range(24)], state="readonly")
+        stunden_combobox.grid(row=1, column=0, padx=5, pady=5)
+        # Minuten-Combobox
+        minuten_combobox = ttk.Combobox(timepicker_frame, values=[f"{i:02d}" for i in range(60)], state="readonly")
+        minuten_combobox.grid(row=1, column=1, padx=5, pady=5)
+        # ... rest of your code ... 
+        def uebernehmen_zeit():
+            ausgewaehlte_stunde = stunden_combobox.get()
+            ausgewaehlte_minute = minuten_combobox.get()
+            Log.log(logfile, f"Ausgewählte Zeit: {ausgewaehlte_stunde}:{ausgewaehlte_minute}")
+            werte_zum_speichern = {
+                "stunde": ausgewaehlte_stunde,
+                "minute": ausgewaehlte_minute
+            }
+            speichere_shedule_time(werte_zum_speichern)
+        ctk.CTkButton(automation_frame, text=texte["zeit_button"], command=uebernehmen_zeit).grid(row=2, column=0, columnspan=2, padx=5, pady=5)
+
     else:
         ctk.CTkLabel(recorder_frame, text=texte["rec_lizenz_abgelaufen"]).grid(row=0, column=0, padx=20, pady=50)
         ctk.CTkLabel(automation_frame, text=texte["rec_lizenz_abgelaufen"]).grid(row=0, column=0, columnspan=2, padx=20, pady=50)
@@ -458,7 +520,7 @@ except:
     ctk.CTkLabel(automation_frame, text=texte["rec_lizenz_ungueltig"]).grid(row=0, column=0, columnspan=2, padx=20, pady=50)
 
 # Info-Elemente
-ctk.CTkButton(info_frame, text=texte["lizenz_button"], command=button_lizenz).grid(row=1, column=0, columnspan=2, padx=20, pady=20)
+ctk.CTkButton(info_frame, text=texte["lizenz_button"], command=button_lizenz).grid(row=1, column=1, columnspan=2, padx=20, pady=20)
 ctk.CTkButton(info_frame, text=texte["hilfe_button"], command=show_help).grid(row=0, column=0, columnspan=2, padx=20, pady=20)
 ctk.CTkButton(info_frame, text=texte["lizenzordner_button"], command=button_lizenzordner).grid(row=2, column=0, columnspan=2, padx=20, pady=20)
 
@@ -493,5 +555,6 @@ wert1, wert2 = lade_standardwerte()
 # Fenster anzeigen
 d = "Window generiert!"
 Log.log(logfile, d)
+
 fenster.mainloop()
 #}
