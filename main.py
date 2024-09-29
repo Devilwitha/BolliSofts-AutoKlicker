@@ -482,11 +482,14 @@ timepicker_frame.grid(row=1, column=0, columnspan=2, padx=5, pady=5)
 # Recorder-Elemente (Wir verwenden jetzt CTkLabels und CTkButtons)
 try:
     if gueltigkeiten[0]:
-        ctk.CTkLabel(recorder_frame, text=texte["recorder_label"]).grid(row=0, column=0, padx=5, pady=5)
+        ctk.CTkLabel(recorder_frame, text=texte["recorder_label"]).grid(row=0, column=0, columnspan=2, padx=5, pady=5)
         combobox = ttk.Combobox(recorder_frame, state="readonly")  # Combobox bleibt von ttk
-        combobox.grid(row=1, column=0, padx=5, pady=5)
+        combobox.grid(row=1, column=0, columnspan=2, padx=5, pady=5)
         combobox.bind("<Button-1>", populate_dropdown)
         combobox.bind("<<ComboboxSelected>>", on_select)
+
+        automation_frame.columnconfigure(0, weight=1)
+        automation_frame.rowconfigure(0, weight=2)
 
         ctk.CTkButton(recorder_frame, text=texte["rec_titel"], command=button_rec).grid(row=2, column=0, columnspan=2, padx=20, pady=5)
         ctk.CTkButton(recorder_frame, text=texte["play_title"], command=button_play).grid(row=3, column=0, columnspan=2, padx=20, pady=5)
@@ -535,15 +538,17 @@ entry2.grid(row=1, column=1, padx=5, pady=5)
 
 ctk.CTkButton(keybindings_frame, text=texte["keybindings_speichern_button"], command=on_confirm).grid(row=2, column=0, columnspan=2, padx=5, pady=5)
 
+screenrec_frame.columnconfigure(0, weight=1)
 ctk.CTkButton(screenrec_frame, text=texte["screenrec_button"], command=button_screenrec).grid(row=0, column=0, columnspan=2, padx=5, pady=5)
 ctk.CTkButton(screenrec_frame, text=texte["csvordner_button"], command=button_videoordner).grid(row=1, column=0, columnspan=2, padx=5, pady=5)
 
 # Automation-Elemente
 try:
     if gueltigkeiten[1]:
-        ctk.CTkButton(db_frame, text=texte["db_remove_dublicates"], command=button_dbverarbeiten).grid(row=0, column=0, columnspan=2, padx=5, pady=5)
-        ctk.CTkButton(db_frame, text=texte["compare_csv"], command=button_ccsv).grid(row=1, column=0, columnspan=2, padx=5, pady=5)
-        ctk.CTkButton(db_frame, text=texte["csvordner_button"], command=button_csvordner).grid(row=2, column=0, columnspan=2, padx=5, pady=5)
+        db_frame.columnconfigure(0, weight=1)
+        ctk.CTkButton(db_frame, text=texte["db_remove_dublicates"], command=button_dbverarbeiten).grid(row=0, column=0, padx=5, pady=5)
+        ctk.CTkButton(db_frame, text=texte["compare_csv"], command=button_ccsv).grid(row=1, column=0, padx=5, pady=5)
+        ctk.CTkButton(db_frame, text=texte["csvordner_button"], command=button_csvordner).grid(row=2, column=0, padx=5, pady=5)
         print("DB Lizenz Gültig!")
     else:
         ctk.CTkLabel(db_frame, text=texte["db_lizenz_abgelaufen"]).grid(row=0, column=0, padx=5, pady=50)
@@ -556,5 +561,18 @@ wert1, wert2 = lade_standardwerte()
 d = "Window generiert!"
 Log.log(logfile, d)
 
+def beim_schliessen():
+    try:
+        d = "Hauptfenster wurde geschlossen!\nSchliesse Automations Thread"
+        Log.log(logfile, d)
+        button_kill_automation()
+        d = "Automations Thread geschlossen"
+        Log.log(logfile, d)
+    except: 
+        d = "Automation läuft nicht!"
+        Log.log(logfile, d)
+    fenster.destroy()
+
+fenster.protocol("WM_DELETE_WINDOW", beim_schliessen)
 fenster.mainloop()
 #}

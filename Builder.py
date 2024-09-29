@@ -28,7 +28,8 @@ include_files = [
 # Definiere die Pakete, die inkludiert werden sollen
 packages = [
     "babel", 
-    "cryptography", 
+    "cryptography",
+    "psutil", 
     "pyaes", 
     "tkcalendar", 
     "keyboard", 

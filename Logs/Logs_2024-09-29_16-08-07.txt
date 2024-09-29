@@ -1,0 +1,24 @@
+1. Sprache Laden
+2. de
+3. ./Sprache/de.txt
+4. Schlüssel und Token aus Dateien laden
+5. Schlüssel gelesen: b'DakTPU9AbSpCpWJiJQ6_oJ24jNcgtO81Rg0qJmNDjpg='
+6. Token gelesen:: b'gAAAAABm9ytbC9dTUeQFTghSehVmLRF-glvwPvKYaQSWh04ZjO-VqOxncv1CaoW1RKA7qG2tmnjohgPPMDQJYz0HZ0Nf9uS3aarvHluT83c3Szm-vjSoEvQ='
+7. Entschlüsseltes Datum: 2024-09-30:2024-09-30
+8. Datumswerte trennen und überprüfen
+9. Liste zur Speicherung der Gültigkeiten
+10. Datum Heute: 2024-09-29
+11. Lizenz mit Ablaufdatum 2024-09-30 ist gültig.
+12. Lizenz mit Ablaufdatum 2024-09-30 ist gültig.
+13. Hauptfenster erstellen
+14. Lizenz Check Window Size
+15. Window size: 800x400
+16. Alle Lizenzen gültig Window
+17. ./Bilder/FIcon.ico
+18. Lade Standart werte
+19. Gelesen: [f3] : [f4]
+20. Window generiert!
+21. Hauptfenster wurde geschlossen!
+Schliesse Automations Thread
+1. Button: button_kill_automation
+2. Automation läuft nicht!
