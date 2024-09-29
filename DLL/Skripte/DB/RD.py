@@ -82,10 +82,11 @@ def remove_duplicates():
             writer.writerows(unique_rows)
 
         # Display result message
-        messagebox.showinfo(texte["erfolgreich_title"], texte["vorher_nacher_csv"].format(len(rows), len(unique_rows)))
-        print(f"Datei erfolgreich bereinigt und gespeichert! Vorher: {len(rows)} Zeilen, Nachher: {len(unique_rows)} Zeilen")
+        messagebox.showinfo(texte["erfolgreich_title"], f"Datei erfolgreich bereinigt und gespeichert! Vorher: {len(rows)} Zeilen, Nachher: {len(unique_rows)} Zeilen")
+        #print()
 
     except Exception as e:
         messagebox.showwarning(texte["error"], texte["error_01"].format(e))
         print(f"Ein Fehler ist aufgetreten: {e}")
+
 

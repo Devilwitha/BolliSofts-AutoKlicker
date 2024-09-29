@@ -104,7 +104,7 @@ def compare_and_remove_duplicates():
         # Display removed rows
         if removed_rows:
             # Update the result label with information about removed rows
-            messagebox.showwarning(texte["abort"], texte["save_erfolg"].format(len(file2_rows), len(file2_unique_rows), len(removed_rows)))
+            messagebox.showinfo(texte["erfolgreich_title"], texte["save_erfolg"].format(len(file2_rows), len(file2_unique_rows), len(removed_rows)))
             print(f"Datei erfolgreich gespeichert!\nVorher: {len(file2_rows)} Zeilen, Nachher: {len(file2_unique_rows)}\n\nEntfernte Zeilen: {len(removed_rows)}")
 
     except Exception as e:
