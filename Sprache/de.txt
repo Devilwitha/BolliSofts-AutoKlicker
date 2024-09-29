@@ -47,3 +47,4 @@ kill_automation_button = Automation  Stopen
 screenrec_button = Bildschirm aufnahme
 stop_screenrec_button = Aufnahme    beenden
 zeit_button = Zeit übernehmen
+mainexe_isrunning = {} läuft bereits.\nJa: um das Pogramm zu schliessen.\nNein: um abzubrechen

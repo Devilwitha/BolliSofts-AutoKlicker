@@ -1,2 +1,2 @@
-stunde = 15
-minute = 28
+stunde = 08
+minute = 00

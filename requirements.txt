@@ -15,3 +15,4 @@ pyinstaller
 customtkinter
 schedule
 opencv-python
+psutil
