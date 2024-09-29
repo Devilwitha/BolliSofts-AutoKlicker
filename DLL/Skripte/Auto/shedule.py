@@ -4,7 +4,9 @@ import threading
 from tkinter import filedialog
 import sys
 sys.path.append('../ScreenRec')
+sys.path.append('../exeRunningChecker')
 import play
+import erc
 
 stop_flag = threading.Event()  # Definiere stop_flag global
 
@@ -44,8 +46,11 @@ def schedule_task(zeit1, input_txt):
 
     while not stop_flag.is_set():  # Führe die Schleife aus, bis stop_flag gesetzt wird
         schedule.run_pending()
-        print("Automation is Running!")
-        time.sleep(1)  # Überprüfe jede Sekunde auf anstehende Aufgaben
+        if erc.isrunning_prozess("main.exe"):
+            print("Automation is Running!")
+            time.sleep(1)  # Überprüfe jede Sekunde auf anstehende Aufgaben
+        else:
+            erc.beende_prozess("main.exe")
 
 # Starte den Scheduler in einem separaten Thread
 def start_schedule(zeit1):

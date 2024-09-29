@@ -12,6 +12,7 @@ sys.path.append('./DLL/Skripte/DB/')
 sys.path.append('./DLL/Skripte/Auto/')
 sys.path.append('./DLL/Skripte/DRec/')
 sys.path.append('./DLL/Skripte/Logger/')
+sys.path.append('./DLL/Skripte/exeRunningChecker/')
 from cryptography.fernet import Fernet
 from datetime import datetime, date
 import tkinter as tk
@@ -36,6 +37,7 @@ import schedule
 import displayrec as drec
 import cv2
 import Log
+import erc
 
 
 
@@ -43,9 +45,61 @@ selected_file=None
 wert1=None
 wert2=None
 logfile = Log.erstelle_log_datei()
-
+exe_file="main.exe"
 from cryptography.fernet import Fernet
 from datetime import datetime, date
+
+def lade_sprache():
+    """Lädt die Sprachdatei basierend auf der Windows-Spracheinstellung."""
+
+    # Sprache erkennen
+    sprache = locale.getdefaultlocale()[0][:2]  # z.B. 'de' oder 'en'
+    d = (sprache)
+    Log.log(logfile, d)
+
+    # Sprachdatei laden
+    dateiname = f"./Sprache/{sprache}.txt"
+    if not os.path.exists(dateiname):
+        dateiname = "./Sprache/en.txt"  # Standardmäßig Deutsch laden
+    d = (dateiname)
+    Log.log(logfile, d)
+
+    texte = {}
+    with open(dateiname, "r", encoding="utf-8") as f:
+        for zeile in f:
+            text_id, text = zeile.strip().split(" = ")
+            # Ersetze '\\n' durch tatsächliche Zeilenumbrüche
+            textt = text.replace("\\n", "\n")
+            texte[text_id] = textt
+            
+
+    return texte
+
+# Sprachdatei laden
+d = "Sprache Laden"
+Log.log(logfile, d)
+texte = lade_sprache()
+
+
+def ja_nein_frage_tkinter(frage):
+    """Stellt eine Ja/Nein-Frage in einem Tkinter-Dialogfenster."""
+    # Frage im Dialogfenster anzeigen
+    d = "Frage im Dialogfenster anzeigen" 
+    Log.log(logfile, d)
+    ask = messagebox.askquestion("Frage", frage, type=messagebox.YESNO)
+    print(ask)
+    if ask == "no":
+        Log.log(logfile, "Selected: NO") 
+        Log.log(logfile, "Window wird Geschlossen!")
+        sys.exit()
+    elif ask == "yes": 
+        Log.log(logfile, "Selected: Yes")
+        erc.beende_prozess(exe_file)
+        d = f"{exe_file} wurde beended!" 
+        Log.log(logfile, d)
+
+#if erc.isrunning_prozess(exe_file):
+    #ja_nein_frage_tkinter(texte.get("mainexe_isrunning", "mainexe_isrunning nicht gefunden").format(exe_file))
 
 def datum_aus_token_entschluesseln(schluessel_datei="./Lizenz/Lizenz.key", token_datei="./Lizenz/_Lizenz.enc"):
     """
@@ -149,36 +203,6 @@ def lade_shedule_time():
 
     return texte
 
-def lade_sprache():
-    """Lädt die Sprachdatei basierend auf der Windows-Spracheinstellung."""
-
-    # Sprache erkennen
-    sprache = locale.getdefaultlocale()[0][:2]  # z.B. 'de' oder 'en'
-    d = (sprache)
-    Log.log(logfile, d)
-
-    # Sprachdatei laden
-    dateiname = f"./Sprache/{sprache}.txt"
-    if not os.path.exists(dateiname):
-        dateiname = "./Sprache/en.txt"  # Standardmäßig Deutsch laden
-    d = (dateiname)
-    Log.log(logfile, d)
-
-    texte = {}
-    with open(dateiname, "r", encoding="utf-8") as f:
-        for zeile in f:
-            text_id, text = zeile.strip().split(" = ")
-            # Ersetze '\\n' durch tatsächliche Zeilenumbrüche
-            textt = text.replace("\\n", "\n")
-            texte[text_id] = textt
-            
-
-    return texte
-
-# Sprachdatei laden
-d = "Sprache Laden"
-Log.log(logfile, d)
-texte = lade_sprache()
 
 # Hauptprogramm
 datum_werte, gueltigkeiten = datum_aus_token_entschluesseln()

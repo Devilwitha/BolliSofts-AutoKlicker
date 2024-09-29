@@ -47,3 +47,4 @@ kill_automation_button = Stop Automation
 screenrec_button = Screen Recording
 stop_screenrec_button = Stop Recording
 zeit_button = Adopt Time
+mainexe_isrunning = {} is running.\nyes: to Close the Pogram.\nNein: to abort
