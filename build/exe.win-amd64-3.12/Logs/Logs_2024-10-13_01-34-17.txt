@@ -1,0 +1,17 @@
+1. Sprache Laden
+2. de
+3. ./Sprache/de.txt
+4. Schlüssel und Token aus Dateien laden
+5. Fehler: Datei nicht gefunden. Überprüfe die Pfade './Lizenz/Lizenz.key' und './Lizenz/_Lizenz.enc'.
+6. Hauptfenster erstellen
+7. Lizenz Check Window Size
+8. Window size: 650x400
+9. Keine Lizenz Window
+10. ./Bilder/FIcon.ico
+11. Lade Standart werte
+12. Gelesen: [f3] : [f4]
+13. Window generiert!
+14. Hauptfenster wurde geschlossen!
+Schliesse Automations Thread
+1. Button: button_kill_automation
+2. Automation läuft nicht!
