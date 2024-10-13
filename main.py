@@ -469,9 +469,9 @@ try:
         fenster.geometry("430x340")
         d=("DB Lizenz only window")
     else:  # Keine Lizenz gültig (implizit, kein `try-except` nötig)
-        xy = ("420x340")  # Oder eine andere Standardgröße
+        xy = ("700x580")  # Oder eine andere Standardgröße
 except:
-    xy = ("650x400")  # Oder eine andere Standardgröße
+    xy = ("700x580")  # Oder eine andere Standardgröße
     d="Keine Lizenz Window"
 fenster.geometry (xy) 
 Log.log(logfile, "Window size: "+xy)
