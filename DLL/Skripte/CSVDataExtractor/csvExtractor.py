@@ -12,7 +12,6 @@ def csvExtractor():
     Returns:
         pandas.DataFrame: Der DataFrame mit den Daten aus der CSV-Datei oder None, wenn keine Datei ausgewählt wurde.
     """
-    # Create a hidden root window for non-blocking file dialog
     root = Tk()
     root.withdraw()  # Hide the main Tkinter window
     file_path = filedialog.askopenfilename(
@@ -34,7 +33,7 @@ def csvExtractor():
 
 def extrahiere_informationen(text):
     """
-    Extrahiert relevante Informationen aus einem Text (z.B. einer Stellenbeschreibung).
+    Verbessert die Extraktion relevanter Informationen aus einem Text (z.B. einer Stellenbeschreibung).
 
     Args:
         text (str): Der Text, aus dem die Informationen extrahiert werden sollen.
@@ -44,31 +43,31 @@ def extrahiere_informationen(text):
     """
     informationen = {}
 
-    # Extrahiere Ansprechpartner (Beispiel)
+    # Verbessere die Regex für Ansprechpartner (inkl. mehrteiliger Namen)
     ansprechpartner = re.findall(r"(?:Herr|Frau)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)", text)
     informationen["Ansprechpartner"] = ansprechpartner[0] if ansprechpartner else None
 
-    # Extrahiere Firmengröße (Beispiel)
-    firmengroesse = re.findall(r"(\d+)\s+(Mitarbeiter|Angestellte)", text)
+    # Fange eine größere Vielfalt an Firmengrößen (inkl. Bereichsangaben)
+    firmengroesse = re.findall(r"(\d{1,5})(?:\s*-\s*\d{1,5})?\s+(Mitarbeiter|Angestellte)", text)
     informationen["Firmengröße"] = firmengroesse[0][0] if firmengroesse else None
 
-    # Extrahiere Anzahl der Standorte (Beispiel)
-    standorte = re.findall(r"(\d+)\s+Standorten", text)
+    # Extrahiere Standorte
+    standorte = re.findall(r"(\d{1,3})\s+Standorte?", text)
     informationen["Standorte"] = standorte[0] if standorte else None
 
-    # Extrahiere Telefonnummern (Beispiel)
-    telefonnummern = re.findall(r"(\+\d{2}\s*\d{3}\s*\d{3}\s*\d{2}\s*\d{2})", text)
-    informationen["Telefonnummern"] = telefonnummern
+    # Telefonnummern in verschiedenen Formaten extrahieren
+    telefonnummern = re.findall(r"(\+?\d{1,3}[-.\s]?\(?\d{1,4}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9})", text)
+    informationen["Telefon"] = telefonnummern
 
-    # Extrahiere E-Mail-Adressen (Beispiel)
+    # E-Mail-Adressen auch bei komplexen Schreibweisen (inkl. Sonderzeichen)
     email_adressen = re.findall(r"([\w\.-]+@[\w\.-]+\.\w+)", text)
-    informationen["E-Mail-Adressen"] = email_adressen
+    informationen["EMail"] = email_adressen
 
     return informationen
 
 def suche_unternehmen_online(firmenname):
     """
-    Sucht nach zusätzlichen Informationen über ein Unternehmen im Internet.
+    Verbessert die Suche nach zusätzlichen Informationen über ein Unternehmen im Internet.
 
     Args:
         firmenname (str): Der Name des Unternehmens.
@@ -79,30 +78,27 @@ def suche_unternehmen_online(firmenname):
     informationen = {}
 
     try:
-        # Hier könnte eine API oder Webscraping-Tool verwendet werden, um firmenname zu suchen
-        # Dies ist ein Platzhalter für API-Nutzung, da Scraping Google möglicherweise gegen Nutzungsrichtlinien verstößt.
         url = f"https://www.google.com/search?q={firmenname}"
-        response = requests.get(url)
+        response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
         soup = BeautifulSoup(response.content, "html.parser")
 
-        # Hier wird nur das erste Ergebnis als Platzhalter betrachtet
-        erste_ergebnis = soup.find("a", href=True)
-        if erste_ergebnis:
-            response = requests.get(erste_ergebnis["href"])
-            soup = BeautifulSoup(response.content, "html.parser")
-            # Weitere Informationen extrahieren
-            informationen["Webseite"] = erste_ergebnis["href"]
+        # Suche nach allgemeinen Links, die nicht nur auf Google-Dienste verweisen
+        ergebnisse = soup.find_all("a", href=True)
+        for ergebnis in ergebnisse:
+            href = ergebnis['href']
+            if 'http' in href and 'google' not in href:
+                informationen["Webseite"] = href
+                break
         else:
-            print(f"Keine Webseite für {firmenname} gefunden.")
-
+            informationen["Webseite"] = "Keine Webseite gefunden."
     except requests.RequestException as e:
-        print(f"Fehler bei der Online-Suche für {firmenname}: {e}")
+        informationen["Fehler"] = f"Fehler bei der Online-Suche: {e}"
 
     return informationen
 
 def process_data(df):
     """
-    Führt die Extraktion von Informationen aus den CSV-Daten durch.
+    Führt die Extraktion von Informationen aus den CSV-Daten durch und zeigt den Fortschritt in Prozent an.
     
     Args:
         df (pandas.DataFrame): Der DataFrame mit den Stellenbeschreibungen und Firmennamen.
@@ -113,8 +109,16 @@ def process_data(df):
     stellenbeschreibungen_spalte = "Stelle"  # Anpassen, falls die Spalte anders heißt
     firmenname_spalte = "Firmenname"  # Anpassen, falls die Spalte anders heißt
 
-    df["Informationen"] = df[stellenbeschreibungen_spalte].apply(extrahiere_informationen)
-    df["Online-Informationen"] = df[firmenname_spalte].apply(suche_unternehmen_online)
+    total_rows = len(df)
+    
+    for idx, row in df.iterrows():
+        df.at[idx, "Informationen"] = extrahiere_informationen(row[stellenbeschreibungen_spalte])
+        df.at[idx, "Online-Informationen"] = suche_unternehmen_online(row[firmenname_spalte])
+        
+        # Fortschritt berechnen
+        fortschritt = (idx + 1) / total_rows * 100
+        print(f"Fortschritt: {fortschritt:.2f}%")
+
     return df
 
 # Lade CSV-Datei und starte Extraktion in separatem Thread
