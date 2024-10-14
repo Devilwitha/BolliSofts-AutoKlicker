@@ -1,9 +1,19 @@
+
+# Google Places API key (Replace with your actual key)
+API_KEY = "AIzaSyBCIfmqSj9lgotw_a6zFgKtzl9E4Oh7mlw"
+
+
 import pandas as pd
 from tkinter import filedialog, Tk
-import re
+import googlemaps
+import threading
 import requests
 from bs4 import BeautifulSoup
-import threading
+import re
+
+
+# Initialize the Google Maps Client
+gmaps = googlemaps.Client(key=API_KEY)
 
 def csvExtractor():
     """
@@ -32,77 +42,126 @@ def csvExtractor():
         print("Keine Datei ausgewählt.")
         return None
 
-def extrahiere_informationen(text):
+def scrape_email_from_website(website_url):
     """
-    Extrahiert relevante Informationen aus einem Text (z.B. einer Stellenbeschreibung).
+    Versucht, eine E-Mail-Adresse von der Webseite zu extrahieren.
 
     Args:
-        text (str): Der Text, aus dem die Informationen extrahiert werden sollen.
+        website_url (str): Die URL der Webseite.
 
     Returns:
-        dict: Ein Dictionary mit den extrahierten Informationen.
+        str: Die gefundene E-Mail-Adresse oder "Nicht gefunden", falls keine E-Mail-Adresse extrahiert werden konnte.
     """
-    informationen = {}
+    try:
+        response = requests.get(website_url, timeout=10)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.content, "html.parser")
+        
+        # Suche nach E-Mail-Adressen im Webseiteninhalt
+        email_addresses = re.findall(r'[\w\.-]+@[\w\.-]+\.\w+', soup.get_text())
+        if email_addresses:
+            return email_addresses[0]  # Return the first found email address
+        else:
+            return "Nicht gefunden"
+    
+    except requests.RequestException as e:
+        print(f"Fehler beim Abrufen der Webseite {website_url}: {e}")
+        return "Nicht gefunden"
 
-    # Extrahiere Ansprechpartner (Beispiel)
-    ansprechpartner = re.findall(r"(?:Herr|Frau)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)", text)
-    informationen["Ansprechpartner"] = ansprechpartner[0] if ansprechpartner else None
+def scrape_ceo_team_and_size(website_url):
+    """
+    Versucht, den Geschäftsführer, das Team und die Firmengröße von der Webseite zu extrahieren.
 
-    # Extrahiere Firmengröße (Beispiel)
-    firmengroesse = re.findall(r"(\d+)\s+(Mitarbeiter|Angestellte)", text)
-    informationen["Firmengröße"] = firmengroesse[0][0] if firmengroesse else None
+    Args:
+        website_url (str): Die URL der Webseite.
 
-    # Extrahiere Anzahl der Standorte (Beispiel)
-    standorte = re.findall(r"(\d+)\s+Standorten", text)
-    informationen["Standorte"] = standorte[0] if standorte else None
+    Returns:
+        dict: Ein Dictionary mit dem Geschäftsführer, Team und Firmengröße, falls gefunden.
+    """
+    informationen = {
+        "Geschäftsführer/Ansprechpartner": "Nicht gefunden",
+        "Team": "Nicht gefunden",
+        "Firmengröße": "Nicht gefunden"
+    }
 
-    # Extrahiere Telefonnummern (Beispiel)
-    telefonnummern = re.findall(r"(\+\d{2}\s*\d{3}\s*\d{3}\s*\d{2}\s*\d{2})", text)
-    informationen["Telefonnummern"] = telefonnummern
+    try:
+        response = requests.get(website_url, timeout=10)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.content, "html.parser")
+        text = soup.get_text()
 
-    # Extrahiere E-Mail-Adressen (Beispiel)
-    email_adressen = re.findall(r"([\w\.-]+@[\w\.-]+\.\w+)", text)
-    informationen["E-Mail-Adressen"] = email_adressen
+        # Suche nach Geschäftsführer/Ansprechpartner (Beispiele)
+        ceo_match = re.findall(r"(Geschäftsführer|CEO|Manager|Ansprechpartner)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)", text)
+        if ceo_match:
+            informationen["Geschäftsführer/Ansprechpartner"] = ceo_match[0][1]
+
+        # Suche nach Firmengröße (Beispiele)
+        size_match = re.findall(r"(\d+)\s+(Mitarbeiter|Angestellte|Beschäftigte|Personen)", text)
+        if size_match:
+            informationen["Firmengröße"] = f"{size_match[0][0]} {size_match[0][1]}"
+
+        # Suche nach Team (Beispielhaft: versucht auf "Team" oder ähnliche Seiten zuzugreifen)
+        team_section = soup.find_all(string=re.compile("Team|Über uns"))
+        if team_section:
+            informationen["Team"] = "Team gefunden"  # You could extract more details if available.
+    
+    except requests.RequestException as e:
+        print(f"Fehler beim Abrufen der Webseite {website_url}: {e}")
 
     return informationen
 
 def suche_unternehmen_online(firmenname):
     """
-    Sucht nach zusätzlichen Informationen über ein Unternehmen im Internet.
+    Sucht nach zusätzlichen Informationen über ein Unternehmen mit der Google Places API, inklusive Telefonnummer, Webseite, Öffnungszeiten und E-Mail-Adresse.
 
     Args:
         firmenname (str): Der Name des Unternehmens.
 
     Returns:
-        dict: Ein Dictionary mit den gefundenen Informationen.
+        dict: Ein Dictionary mit den gefundenen Informationen wie Telefonnummer, Webseite, Öffnungszeiten, E-Mail, Geschäftsführer und Firmengröße.
     """
     informationen = {}
-
     try:
-        # Hier könnte eine API oder Webscraping-Tool verwendet werden, um firmenname zu suchen
-        # Dies ist ein Platzhalter für API-Nutzung, da Scraping Google möglicherweise gegen Nutzungsrichtlinien verstößt.
-        url = f"https://www.google.com/search?q={firmenname}"
-        response = requests.get(url)
-        soup = BeautifulSoup(response.content, "html.parser")
+        # Sucht nach dem Unternehmen mit der Google Places API
+        places_result = gmaps.places(query=firmenname)
+        
+        if places_result["status"] == "OK" and places_result["results"]:
+            # Nimmt das erste Ergebnis als das relevante Unternehmen
+            place_id = places_result["results"][0]["place_id"]
+            place_details = gmaps.place(place_id=place_id)
 
-        # Hier wird nur das erste Ergebnis als Platzhalter betrachtet
-        erste_ergebnis = soup.find("a", href=True)
-        if erste_ergebnis:
-            response = requests.get(erste_ergebnis["href"])
-            soup = BeautifulSoup(response.content, "html.parser")
-            # Weitere Informationen extrahieren
-            informationen["Webseite"] = erste_ergebnis["href"]
+            if place_details["status"] == "OK":
+                details = place_details["result"]
+                informationen["Telefonnummer"] = details.get("formatted_phone_number", "Nicht gefunden")
+                informationen["Webseite"] = details.get("website", "Nicht gefunden")
+                
+                # Öffnungszeiten extrahieren
+                opening_hours = details.get("opening_hours", {}).get("weekday_text", [])
+                informationen["Öffnungszeiten"] = opening_hours if opening_hours else "Nicht gefunden"
+
+                # Wenn eine Webseite vorhanden ist, versuche E-Mail-Adresse, Geschäftsführer und Firmengröße zu extrahieren
+                if "Webseite" in informationen and informationen["Webseite"] != "Nicht gefunden":
+                    informationen["E-Mail"] = scrape_email_from_website(informationen["Webseite"])
+                    additional_info = scrape_ceo_team_and_size(informationen["Webseite"])
+                    informationen.update(additional_info)
+                else:
+                    informationen["E-Mail"] = "Nicht gefunden"
+                    informationen["Geschäftsführer/Ansprechpartner"] = "Nicht gefunden"
+                    informationen["Firmengröße"] = "Nicht gefunden"
+                    informationen["Team"] = "Nicht gefunden"
+            else:
+                print(f"Details nicht für {firmenname} gefunden.")
         else:
-            print(f"Keine Webseite für {firmenname} gefunden.")
+            print(f"Kein Unternehmen für {firmenname} gefunden.")
 
-    except requests.RequestException as e:
-        print(f"Fehler bei der Online-Suche für {firmenname}: {e}")
-
+    except Exception as e:
+        print(f"Fehler bei der Google Places API-Suche für {firmenname}: {e}")
+    
     return informationen
 
 def process_data(df):
     """
-    Führt die Extraktion von Informationen aus den CSV-Daten durch.
+    Führt die Extraktion von Informationen aus den CSV-Daten durch und sucht online nach zusätzlichen Informationen.
     
     Args:
         df (pandas.DataFrame): Der DataFrame mit den Stellenbeschreibungen und Firmennamen.
@@ -110,10 +169,9 @@ def process_data(df):
     Returns:
         pandas.DataFrame: Der DataFrame mit den extrahierten Informationen.
     """
-    stellenbeschreibungen_spalte = "Stelle"  # Anpassen, falls die Spalte anders heißt
     firmenname_spalte = "Firmenname"  # Anpassen, falls die Spalte anders heißt
 
-    df["Informationen"] = df[stellenbeschreibungen_spalte].apply(extrahiere_informationen)
+    # Suche nach Online-Informationen für jedes Unternehmen in der CSV-Datei
     df["Online-Informationen"] = df[firmenname_spalte].apply(suche_unternehmen_online)
     return df
 
