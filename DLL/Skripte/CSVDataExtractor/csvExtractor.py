@@ -182,6 +182,9 @@ def main():
         df = process_data(df)
         print(df.head())
         df.to_csv("stellenangebote_mit_informationen.csv", index=False)
+        if debug_on:
+            print("Informationen wurden gesammelt!")
+            print("CVS gespeichert und Ready!")
 
 if __name__ == "__main__":
     thread = threading.Thread(target=main)
