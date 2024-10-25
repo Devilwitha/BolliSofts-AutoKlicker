@@ -9,3 +9,6 @@ pyinstaller
 schedule 
 opencv-python 
 psutil
+pandas
+bs4
+googlemaps
