@@ -12,6 +12,11 @@ from bs4 import BeautifulSoup
 import re
 
 
+# LinkedIn API credentials (replace with your LinkedIn App details)
+LINKEDIN_CLIENT_ID = "YOUR_LINKEDIN_CLIENT_ID"
+LINKEDIN_CLIENT_SECRET = "YOUR_LINKEDIN_CLIENT_SECRET"
+LINKEDIN_ACCESS_TOKEN = "YOUR_LINKEDIN_ACCESS_TOKEN"  # Obtained after OAuth2 authentication
+
 # Initialize the Google Maps Client
 gmaps = googlemaps.Client(key=API_KEY)
 
@@ -42,6 +47,44 @@ def csvExtractor():
         print("Keine Datei ausgewählt.")
         return None
 
+def get_linkedin_company_info(company_name):
+    """
+    Ruft Informationen zu einem Unternehmen über die LinkedIn API ab, einschließlich Geschäftsführer, Team und Firmengröße.
+    
+    Args:
+        company_name (str): Der Name des Unternehmens, nach dem gesucht werden soll.
+    
+    Returns:
+        dict: Ein Dictionary mit den gefundenen Informationen (CEO, Firmengröße, Team), falls verfügbar.
+    """
+    headers = {
+        "Authorization": f"Bearer {LINKEDIN_ACCESS_TOKEN}"
+    }
+    
+    # LinkedIn company search endpoint
+    search_url = f"https://api.linkedin.com/v2/organizationAcls?q=roleAssignee&role=ADMINISTRATOR&assignee={company_name}"
+    
+    try:
+        response = requests.get(search_url, headers=headers)
+        response.raise_for_status()  # Raise an error for bad responses
+        
+        # Extract company details from the response
+        data = response.json()
+        company_info = {
+            "Geschäftsführer/Ansprechpartner": data.get("localizedName", "Nicht gefunden"),
+            "Firmengröße": data.get("staffCountRange", {}).get("start", "Nicht gefunden"),
+            "Team": "Team Informationen von LinkedIn abrufbar"
+        }
+        return company_info
+
+    except requests.RequestException as e:
+        print(f"Fehler bei der LinkedIn API-Suche für {company_name}: {e}")
+        return {
+            "Geschäftsführer/Ansprechpartner": "Nicht gefunden",
+            "Firmengröße": "Nicht gefunden",
+            "Team": "Nicht gefunden"
+        }
+
 def scrape_email_from_website(website_url):
     """
     Versucht, eine E-Mail-Adresse von der Webseite zu extrahieren.
@@ -68,51 +111,9 @@ def scrape_email_from_website(website_url):
         print(f"Fehler beim Abrufen der Webseite {website_url}: {e}")
         return "Nicht gefunden"
 
-def scrape_ceo_team_and_size(website_url):
-    """
-    Versucht, den Geschäftsführer, das Team und die Firmengröße von der Webseite zu extrahieren.
-
-    Args:
-        website_url (str): Die URL der Webseite.
-
-    Returns:
-        dict: Ein Dictionary mit dem Geschäftsführer, Team und Firmengröße, falls gefunden.
-    """
-    informationen = {
-        "Geschäftsführer/Ansprechpartner": "Nicht gefunden",
-        "Team": "Nicht gefunden",
-        "Firmengröße": "Nicht gefunden"
-    }
-
-    try:
-        response = requests.get(website_url, timeout=10)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.content, "html.parser")
-        text = soup.get_text()
-
-        # Suche nach Geschäftsführer/Ansprechpartner (Beispiele)
-        ceo_match = re.findall(r"(Geschäftsführer|CEO|Manager|Ansprechpartner)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)", text)
-        if ceo_match:
-            informationen["Geschäftsführer/Ansprechpartner"] = ceo_match[0][1]
-
-        # Suche nach Firmengröße (Beispiele)
-        size_match = re.findall(r"(\d+)\s+(Mitarbeiter|Angestellte|Beschäftigte|Personen)", text)
-        if size_match:
-            informationen["Firmengröße"] = f"{size_match[0][0]} {size_match[0][1]}"
-
-        # Suche nach Team (Beispielhaft: versucht auf "Team" oder ähnliche Seiten zuzugreifen)
-        team_section = soup.find_all(string=re.compile("Team|Über uns"))
-        if team_section:
-            informationen["Team"] = "Team gefunden"  # You could extract more details if available.
-    
-    except requests.RequestException as e:
-        print(f"Fehler beim Abrufen der Webseite {website_url}: {e}")
-
-    return informationen
-
 def suche_unternehmen_online(firmenname):
     """
-    Sucht nach zusätzlichen Informationen über ein Unternehmen mit der Google Places API, inklusive Telefonnummer, Webseite, Öffnungszeiten und E-Mail-Adresse.
+    Sucht nach zusätzlichen Informationen über ein Unternehmen mit der Google Places API, LinkedIn API und Webseiten-Scraping, inklusive Telefonnummer, Webseite, Öffnungszeiten und E-Mail-Adresse.
 
     Args:
         firmenname (str): Der Name des Unternehmens.
@@ -142,8 +143,10 @@ def suche_unternehmen_online(firmenname):
                 # Wenn eine Webseite vorhanden ist, versuche E-Mail-Adresse, Geschäftsführer und Firmengröße zu extrahieren
                 if "Webseite" in informationen and informationen["Webseite"] != "Nicht gefunden":
                     informationen["E-Mail"] = scrape_email_from_website(informationen["Webseite"])
-                    additional_info = scrape_ceo_team_and_size(informationen["Webseite"])
-                    informationen.update(additional_info)
+                    
+                    # Versuche, LinkedIn API für zusätzliche Informationen zu nutzen
+                    linkedin_info = get_linkedin_company_info(firmenname)
+                    informationen.update(linkedin_info)
                 else:
                     informationen["E-Mail"] = "Nicht gefunden"
                     informationen["Geschäftsführer/Ansprechpartner"] = "Nicht gefunden"
